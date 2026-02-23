@@ -1,9 +1,10 @@
 /**
  * In-process MCP server that exposes Slack Web API tools to the agent.
  *
- * Reads SLACK_BOT_TOKEN from process.env at call time (not at import time),
- * so the token is available even though the agent's Bash tool doesn't inherit
- * dotenv-loaded env vars.
+ * Token resolution order:
+ *   1. User token from DB (slack_user_tokens table) — acts as the user
+ *   2. SLACK_USER_TOKEN env var — single-workspace user mode fallback
+ *   3. SLACK_BOT_TOKEN env var — bot mode fallback
  *
  * Tools: send, edit, delete messages; read channel/thread history;
  *        react; list channels; user info; pin/unpin; upload file; search.
@@ -16,8 +17,50 @@ import {
 } from "@anthropic-ai/claude-agent-sdk";
 import { z } from "zod/v4";
 
+/** Cached user token loaded from DB (populated on first call). */
+let cachedUserToken: string | null | undefined;
+
+async function loadUserTokenFromDb(): Promise<string | null> {
+  try {
+    const { listWorkspaces } = await import("../db/slack-workspaces.ts");
+    const workspaces = await listWorkspaces();
+    if (workspaces.length > 0) {
+      return workspaces[0].access_token;
+    }
+  } catch {
+    // DB not available — fall through
+  }
+  return null;
+}
+
+async function getClientAsync() {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { WebClient } = require("@slack/web-api") as typeof import("@slack/web-api");
+
+  // Try user token from DB (cached after first lookup)
+  if (cachedUserToken === undefined) {
+    cachedUserToken = await loadUserTokenFromDb();
+  }
+  if (cachedUserToken) {
+    return new WebClient(cachedUserToken);
+  }
+
+  // Fallback: SLACK_USER_TOKEN env var
+  if (process.env.SLACK_USER_TOKEN) {
+    return new WebClient(process.env.SLACK_USER_TOKEN);
+  }
+
+  // Fallback: SLACK_BOT_TOKEN env var
+  const botToken = process.env.SLACK_BOT_TOKEN;
+  if (botToken) {
+    return new WebClient(botToken);
+  }
+
+  throw new Error("No Slack token available (checked DB, SLACK_USER_TOKEN, SLACK_BOT_TOKEN)");
+}
+
+/** Sync wrapper kept for isSlackConfigured() — does not check DB. */
 function getClient() {
-  // Lazy-import to avoid loading @slack/web-api when token isn't set
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { WebClient } = require("@slack/web-api") as typeof import("@slack/web-api");
   const token = process.env.SLACK_BOT_TOKEN;
@@ -56,7 +99,7 @@ const sendMessageTool = tool(
   },
   async (args) => {
     try {
-      const client = getClient();
+      const client = await getClientAsync();
       const result = await client.chat.postMessage({
         channel: args.channel,
         text: args.text,
@@ -89,7 +132,7 @@ const editMessageTool = tool(
   },
   async (args) => {
     try {
-      const client = getClient();
+      const client = await getClientAsync();
       await client.chat.update({
         channel: args.channel,
         ts: args.ts,
@@ -114,7 +157,7 @@ const deleteMessageTool = tool(
   },
   async (args) => {
     try {
-      const client = getClient();
+      const client = await getClientAsync();
       await client.chat.delete({ channel: args.channel, ts: args.ts });
       return { content: [{ type: "text", text: "Message deleted." }] };
     } catch (error) {
@@ -135,7 +178,7 @@ const readChannelTool = tool(
   },
   async (args) => {
     try {
-      const client = getClient();
+      const client = await getClientAsync();
       const result = await client.conversations.history({
         channel: args.channel,
         limit: args.limit ?? 20,
@@ -166,7 +209,7 @@ const readThreadTool = tool(
   },
   async (args) => {
     try {
-      const client = getClient();
+      const client = await getClientAsync();
       const result = await client.conversations.replies({
         channel: args.channel,
         ts: args.thread_ts,
@@ -198,7 +241,7 @@ const reactTool = tool(
   },
   async (args) => {
     try {
-      const client = getClient();
+      const client = await getClientAsync();
       await client.reactions.add({
         channel: args.channel,
         timestamp: args.timestamp,
@@ -234,7 +277,7 @@ const listChannelsTool = tool(
   },
   async (args) => {
     try {
-      const client = getClient();
+      const client = await getClientAsync();
       const result = await client.conversations.list({
         types: args.types ?? "public_channel",
         limit: args.limit ?? 100,
@@ -270,7 +313,7 @@ const userInfoTool = tool(
   },
   async (args) => {
     try {
-      const client = getClient();
+      const client = await getClientAsync();
       const result = await client.users.info({ user: args.user });
       const u = result.user;
       if (!u) {
@@ -308,7 +351,7 @@ const pinMessageTool = tool(
   },
   async (args) => {
     try {
-      const client = getClient();
+      const client = await getClientAsync();
       await client.pins.add({ channel: args.channel, timestamp: args.timestamp });
       return { content: [{ type: "text", text: "Message pinned." }] };
     } catch (error) {
@@ -329,7 +372,7 @@ const unpinMessageTool = tool(
   },
   async (args) => {
     try {
-      const client = getClient();
+      const client = await getClientAsync();
       await client.pins.remove({ channel: args.channel, timestamp: args.timestamp });
       return { content: [{ type: "text", text: "Message unpinned." }] };
     } catch (error) {
@@ -349,7 +392,7 @@ const listPinsTool = tool(
   },
   async (args) => {
     try {
-      const client = getClient();
+      const client = await getClientAsync();
       const result = await client.pins.list({ channel: args.channel });
       const items = result.items ?? [];
       if (items.length === 0) {
@@ -385,7 +428,7 @@ const searchMessagesTool = tool(
   },
   async (args) => {
     try {
-      const client = getClient();
+      const client = await getClientAsync();
       const result = await client.search.messages({
         query: args.query,
         count: args.count ?? 10,
@@ -431,7 +474,7 @@ const uploadFileTool = tool(
           isError: true,
         };
       }
-      const client = getClient();
+      const client = await getClientAsync();
       const fileStream = fs.createReadStream(args.file_path);
       const filename = args.file_path.split("/").pop() ?? "file";
       await client.filesUploadV2({
@@ -456,11 +499,11 @@ const uploadFileTool = tool(
 // ---------------------------------------------------------------------------
 
 /**
- * Returns true if SLACK_BOT_TOKEN is set in the environment.
+ * Returns true if any Slack token is available (user token in DB, env vars).
  * Call this before creating the MCP server to decide whether to register it.
  */
 export function isSlackConfigured(): boolean {
-  return Boolean(process.env.SLACK_BOT_TOKEN);
+  return Boolean(process.env.SLACK_BOT_TOKEN || process.env.SLACK_USER_TOKEN);
 }
 
 /**

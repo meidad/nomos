@@ -1,0 +1,22 @@
+services:
+  postgres:
+    image: pgvector/pgvector:pg17
+    container_name: assistant-postgres
+    environment:
+      POSTGRES_USER: assistant
+      POSTGRES_PASSWORD: assistant
+      POSTGRES_DB: assistant
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-EXEC", "pg_isready -U assistant -d assistant"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+
+volumes:
+  pgdata:
