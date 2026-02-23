@@ -2,13 +2,13 @@ name: Release
 
 on:
   push:
-    tags: ['v*']
+    tags: ["v*"]
 
 permissions:
   contents: write
 
 env:
-  NODE_VERSION: '22'
+  NODE_VERSION: "22"
 
 jobs:
   release:
@@ -25,8 +25,8 @@ jobs:
         uses: actions/setup-node@v6.1.0
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'pnpm'
-          registry-url: 'https://registry.npmjs.org'
+          cache: "pnpm"
+          registry-url: "https://registry.npmjs.org"
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile

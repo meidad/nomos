@@ -53,7 +53,7 @@ Your Slack app needs **User Token Scopes** in addition to the existing Bot Token
 | `mpim:history`     | Read multi-party DMs                    |
 | `chat:write`       | Send messages as you                    |
 | `users:read`       | Look up sender names                    |
-| `search:read`      | Search messages across channels and DMs  |
+| `search:read`      | Search messages across channels and DMs |
 
 ## Step 2: Subscribe to Team Events
 
@@ -340,16 +340,17 @@ If Slack API calls return `missing_scope`, the user token is valid but lacks req
 
 **Diagnosis:** Try different operations to identify which scopes are missing:
 
-| Operation | Required Scope |
-|---|---|
-| List channels | `channels:read` |
-| Read channel messages | `channels:history` |
-| Search messages | `search:read` |
-| Look up users | `users:read` |
-| Send messages | `chat:write` |
-| Read DMs | `im:history`, `im:read` |
+| Operation             | Required Scope          |
+| --------------------- | ----------------------- |
+| List channels         | `channels:read`         |
+| Read channel messages | `channels:history`      |
+| Search messages       | `search:read`           |
+| Look up users         | `users:read`            |
+| Send messages         | `chat:write`            |
+| Read DMs              | `im:history`, `im:read` |
 
 **Fix:**
+
 1. Go to your Slack app's **OAuth & Permissions** page
 2. Under **User Token Scopes**, add the missing scope(s)
 3. **Reinstall the app** to your workspace — scope changes don't take effect until you reinstall
