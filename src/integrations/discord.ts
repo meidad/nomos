@@ -17,7 +17,7 @@
  *   DISCORD_ALLOWED_CHANNELS - Comma-separated channel IDs to restrict to
  *   DISCORD_ALLOWED_GUILDS   - Comma-separated guild IDs to restrict to
  *   DISCORD_AUTO_THREAD      - Enable auto-threading for long conversations (default: false)
- *   ASSISTANT_MODEL          - Model to use (default: claude-sonnet-4-6)
+ *   NOMOS_MODEL              - Model to use (default: claude-sonnet-4-6)
  */
 
 import {
@@ -165,8 +165,8 @@ async function handleMessage(message: Message, client: Client) {
       prompt,
       model: cfg.model,
       systemPromptAppend,
-      mcpServers: { "assistant-memory": memoryServer },
-      allowedTools: ["mcp__assistant-memory"],
+      mcpServers: { "nomos-memory": memoryServer },
+      allowedTools: ["mcp__nomos-memory"],
       permissionMode: cfg.permissionMode,
       resume: resumeId,
       maxTurns: 10,

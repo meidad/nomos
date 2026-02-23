@@ -20,8 +20,8 @@ const DEFAULT_AGENT: AgentConfig = { id: "default", name: "Default" };
 
 export function loadAgentConfigs(): AgentConfig[] {
   const paths = [
-    path.join(process.cwd(), ".assistant", "agents.json"),
-    path.join(os.homedir(), ".assistant", "agents.json"),
+    path.join(process.cwd(), ".nomos", "agents.json"),
+    path.join(os.homedir(), ".nomos", "agents.json"),
   ];
 
   for (const p of paths) {

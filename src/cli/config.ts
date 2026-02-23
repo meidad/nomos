@@ -4,7 +4,7 @@ import { runMigrations } from "../db/migrate.ts";
 import { getConfigValue, setConfigValue, deleteConfigValue, listConfig } from "../db/config.ts";
 
 export function registerConfigCommand(program: Command): void {
-  const cmd = program.command("config").description("Manage assistant configuration");
+  const cmd = program.command("config").description("Manage nomos configuration");
 
   cmd
     .command("get <key>")

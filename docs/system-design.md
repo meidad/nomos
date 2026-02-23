@@ -2,7 +2,7 @@
 
 ## 1. Overview
 
-A TypeScript CLI and multi-channel AI assistant built on the `@anthropic-ai/claude-agent-sdk`. It wraps Claude Code as its agent runtime, inheriting the full tool suite (Bash, Read, Write, Edit, Glob, Grep, WebSearch, sub-agents, context compaction) and adds persistent sessions, vector memory with automatic conversation indexing, a daemon gateway with channel integrations, scheduled tasks, and a skills system.
+A TypeScript CLI and multi-channel AI agent built on the `@anthropic-ai/claude-agent-sdk`. It wraps Claude Code as its agent runtime, inheriting the full tool suite (Bash, Read, Write, Edit, Glob, Grep, WebSearch, sub-agents, context compaction) and adds persistent sessions, vector memory with automatic conversation indexing, a daemon gateway with channel integrations, scheduled tasks, and a skills system.
 
 ### Design Principles
 
@@ -47,12 +47,12 @@ A TypeScript CLI and multi-channel AI assistant built on the `@anthropic-ai/clau
 |          (Agent runtime + conversation management)              |
 |                                                                 |
 |   Built-in tools:              MCP Servers:                     |
-|   - Bash                       - assistant-memory (in-process)  |
+|   - Bash                       - nomos-memory (in-process)  |
 |   - Read / Write / Edit          memory_search, bootstrap       |
 |   - Glob / Grep               - channel MCP servers (in-proc)   |
 |   - WebSearch / WebFetch         slack, discord, telegram, gws  |
 |   - Task (sub-agents)          - external MCP servers            |
-|                                  (from .assistant/mcp.json)     |
+|                                  (from .nomos/mcp.json)     |
 +-----------------------------------------------------------------+
                |
      +---------+---------+
@@ -202,18 +202,18 @@ All state lives in PostgreSQL. Schema defined in `src/db/schema.sql` with inline
 
 #### Tables
 
-| Table | Purpose | Key Columns |
-|---|---|---|
-| `config` | Key-value settings store | `key` (PK), `value` (JSONB) |
-| `sessions` | Session metadata and SDK session IDs | `session_key` (unique), `agent_id`, `model`, `metadata` (JSONB) |
-| `transcript_messages` | Conversation messages | `session_id` (FK), `role`, `content` (JSONB) |
-| `memory_chunks` | Text chunks with vector embeddings | `source`, `text`, `embedding` (vector(768)), `hash` |
-| `memory_files` | Source file tracking for incremental re-indexing | `path` (PK), `source`, `hash`, `mtime` |
-| `cron_jobs` | Scheduled task definitions | `schedule`, `schedule_type`, `prompt`, `enabled` |
-| `pairing_requests` | Channel pairing codes with TTL | `code` (unique), `status`, `expires_at` |
-| `channel_allowlists` | Per-platform user allowlists | `platform` + `user_id` (unique) |
-| `draft_messages` | Slack User Mode approve-before-send drafts | `platform`, `channel_id`, `content`, `status` |
-| `slack_user_tokens` | Multi-workspace Slack OAuth tokens | `team_id` (unique), `access_token`, `team_name` |
+| Table                 | Purpose                                          | Key Columns                                                     |
+| --------------------- | ------------------------------------------------ | --------------------------------------------------------------- |
+| `config`              | Key-value settings store                         | `key` (PK), `value` (JSONB)                                     |
+| `sessions`            | Session metadata and SDK session IDs             | `session_key` (unique), `agent_id`, `model`, `metadata` (JSONB) |
+| `transcript_messages` | Conversation messages                            | `session_id` (FK), `role`, `content` (JSONB)                    |
+| `memory_chunks`       | Text chunks with vector embeddings               | `source`, `text`, `embedding` (vector(768)), `hash`             |
+| `memory_files`        | Source file tracking for incremental re-indexing | `path` (PK), `source`, `hash`, `mtime`                          |
+| `cron_jobs`           | Scheduled task definitions                       | `schedule`, `schedule_type`, `prompt`, `enabled`                |
+| `pairing_requests`    | Channel pairing codes with TTL                   | `code` (unique), `status`, `expires_at`                         |
+| `channel_allowlists`  | Per-platform user allowlists                     | `platform` + `user_id` (unique)                                 |
+| `draft_messages`      | Slack User Mode approve-before-send drafts       | `platform`, `channel_id`, `content`, `status`                   |
+| `slack_user_tokens`   | Multi-workspace Slack OAuth tokens               | `team_id` (unique), `access_token`, `team_name`                 |
 
 #### Indexes
 
@@ -227,7 +227,7 @@ Session keys follow the pattern `<platform>:<channel_id>` (e.g., `cli:default`, 
 
 ### 4.3 MCP Servers
 
-#### In-Process MCP: `assistant-memory`
+#### In-Process MCP: `nomos-memory`
 
 Created via `createSdkMcpServer()` from the Agent SDK (`src/sdk/tools.ts`). Exposes two tools:
 
@@ -245,21 +245,21 @@ Each channel integration exposes an MCP server for proactive messaging from with
 
 #### External MCP Servers
 
-Loaded from `.assistant/mcp.json` (project-local or `~/.assistant/mcp.json` global) and passed to the SDK alongside in-process servers.
+Loaded from `.nomos/mcp.json` (project-local or `~/.nomos/mcp.json` global) and passed to the SDK alongside in-process servers.
 
 ### 4.4 Claude Code as Agent Runtime
 
 The Agent SDK provides natively (no reimplementation needed):
 
-| Capability | SDK Feature |
-|---|---|
-| Agent conversation loop | Built-in multi-turn agent loop |
-| Tool execution | Bash, Read, Write, Edit, Glob, Grep |
-| Sub-agent spawning | Task tool with specialized agent types |
-| Context management | Automatic summarization for unlimited context |
-| Web access | WebSearch + WebFetch tools |
-| Streaming | Real-time token streaming |
-| Parallel execution | Concurrent tool calls |
+| Capability              | SDK Feature                                   |
+| ----------------------- | --------------------------------------------- |
+| Agent conversation loop | Built-in multi-turn agent loop                |
+| Tool execution          | Bash, Read, Write, Edit, Glob, Grep           |
+| Sub-agent spawning      | Task tool with specialized agent types        |
+| Context management      | Automatic summarization for unlimited context |
+| Web access              | WebSearch + WebFetch tools                    |
+| Streaming               | Real-time token streaming                     |
+| Parallel execution      | Concurrent tool calls                         |
 
 What we add via MCP and the daemon:
 
@@ -278,7 +278,7 @@ Skills are markdown files (`SKILL.md`) with YAML frontmatter that provide domain
 Three-tier loading order:
 
 1. **Bundled** -- `skills/` directory shipped with the project
-2. **Personal** -- `~/.assistant/skills/<name>/SKILL.md`
+2. **Personal** -- `~/.nomos/skills/<name>/SKILL.md`
 3. **Project** -- `./skills/<name>/SKILL.md`
 
 Skills support metadata for binary/OS dependencies (`requires`), installation commands (`install`), and display emoji. The bundled `skill-creator` skill enables the agent to author new SKILL.md files via conversation.
@@ -364,18 +364,18 @@ interface ChannelAdapter {
 
 Adapters are intentionally thin (50-100 lines each). They handle only platform authentication, inbound event parsing, and outbound message formatting. All agent logic lives in the shared `AgentRuntime`.
 
-| Adapter | Platform Name | Required Config |
-|---|---|---|
-| Slack (bot) | `slack` | `SLACK_BOT_TOKEN`, `SLACK_APP_TOKEN` |
+| Adapter      | Platform Name          | Required Config                                     |
+| ------------ | ---------------------- | --------------------------------------------------- |
+| Slack (bot)  | `slack`                | `SLACK_BOT_TOKEN`, `SLACK_APP_TOKEN`                |
 | Slack (user) | `slack-user:<team_id>` | DB token + `SLACK_APP_TOKEN`, or `SLACK_USER_TOKEN` |
-| Discord | `discord` | `DISCORD_BOT_TOKEN` |
-| Telegram | `telegram` | `TELEGRAM_BOT_TOKEN` |
-| WhatsApp | `whatsapp` | `WHATSAPP_ENABLED=true` |
-| iMessage | `imessage` | `IMESSAGE_ENABLED=true` (macOS only) |
+| Discord      | `discord`              | `DISCORD_BOT_TOKEN`                                 |
+| Telegram     | `telegram`             | `TELEGRAM_BOT_TOKEN`                                |
+| WhatsApp     | `whatsapp`             | `WHATSAPP_ENABLED=true`                             |
+| iMessage     | `imessage`             | `IMESSAGE_ENABLED=true` (macOS only)                |
 
 ### Slack User Mode (Multi-Workspace)
 
-Slack User Mode enables the assistant to act as the authenticated user. Unlike bot mode, responses go through an approve-before-send workflow:
+Slack User Mode enables Nomos to act as the authenticated user. Unlike bot mode, responses go through an approve-before-send workflow:
 
 ```
 1. Someone DMs you or @mentions you in a channel
@@ -389,8 +389,8 @@ Slack User Mode enables the assistant to act as the authenticated user. Unlike b
 
 Multi-workspace support:
 
-- **OAuth flow**: `assistant slack auth` opens a browser for Slack OAuth, stores the `xoxp-` token per workspace in `slack_user_tokens`
-- **Manual token**: `assistant slack auth --token xoxp-...` stores a token directly
+- **OAuth flow**: `nomos slack auth` opens a browser for Slack OAuth, stores the `xoxp-` token per workspace in `slack_user_tokens`
+- **Manual token**: `nomos slack auth --token xoxp-...` stores a token directly
 - **Platform naming**: Each workspace gets platform name `slack-user:<team_id>` (e.g., `slack-user:T01ABC`)
 - **Backwards compatibility**: If no DB workspaces exist but `SLACK_USER_TOKEN` is set, a single adapter starts as `slack-user:default`
 
@@ -433,14 +433,14 @@ Channel message arrives
 
 ### Terminal UI Modes
 
-The interactive terminal (`assistant chat`) operates in two modes:
+The interactive terminal (`nomos chat`) operates in two modes:
 
 1. **Direct mode** (default): runs the Agent SDK in-process, no daemon needed
 2. **Daemon mode**: terminal UI connects via WebSocket using `GatewayClient` with auto-reconnect and exponential backoff
 
 ### Lifecycle Management
 
-- **PID file**: `~/.assistant/daemon.pid` (written on start, removed on shutdown)
+- **PID file**: `~/.nomos/daemon.pid` (written on start, removed on shutdown)
 - **Signal handlers**: SIGTERM, SIGINT, SIGHUP trigger graceful shutdown
 - **Shutdown order** (reverse of startup): CronEngine -> ChannelManager -> WebSocketServer
 - **Stale PID detection**: checks if PID file references a running process on startup
@@ -467,35 +467,35 @@ The `tool-approval.ts` module detects dangerous operations (destructive shell co
 - `xoxp-` tokens are stored in the database (encrypted at rest depends on PostgreSQL configuration)
 - The approve-before-send workflow ensures the agent never sends messages as the user without explicit approval
 - Drafts expire after 24 hours
-- OAuth tokens can be revoked via `assistant slack remove <team-id>`
+- OAuth tokens can be revoked via `nomos slack remove <team-id>`
 
 ## 7. Configuration
 
 ### Environment Variables
 
-| Variable | Required | Purpose |
-|---|---|---|
-| `DATABASE_URL` | Yes | PostgreSQL connection string |
-| `ANTHROPIC_API_KEY` | One of | Anthropic direct API key |
-| `CLAUDE_CODE_USE_VERTEX` | One of | Enable Vertex AI provider |
-| `GOOGLE_CLOUD_PROJECT` | With Vertex | GCP project ID |
-| `CLOUD_ML_REGION` | With Vertex | GCP region (e.g., `us-east5`) |
-| `ASSISTANT_MODEL` | No | Model override (default: `claude-sonnet-4-6`) |
-| `SLACK_BOT_TOKEN` | No | Slack bot mode |
-| `SLACK_APP_TOKEN` | No | Slack Socket Mode (bot + user mode) |
-| `SLACK_CLIENT_ID` | No | Slack OAuth (multi-workspace user mode) |
-| `SLACK_CLIENT_SECRET` | No | Slack OAuth (multi-workspace user mode) |
-| `SLACK_USER_TOKEN` | No | Legacy single-workspace user mode |
-| `DISCORD_BOT_TOKEN` | No | Discord integration |
-| `TELEGRAM_BOT_TOKEN` | No | Telegram integration |
-| `WHATSAPP_ENABLED` | No | WhatsApp integration |
-| `IMESSAGE_ENABLED` | No | iMessage integration (macOS only) |
+| Variable                 | Required    | Purpose                                       |
+| ------------------------ | ----------- | --------------------------------------------- |
+| `DATABASE_URL`           | Yes         | PostgreSQL connection string                  |
+| `ANTHROPIC_API_KEY`      | One of      | Anthropic direct API key                      |
+| `CLAUDE_CODE_USE_VERTEX` | One of      | Enable Vertex AI provider                     |
+| `GOOGLE_CLOUD_PROJECT`   | With Vertex | GCP project ID                                |
+| `CLOUD_ML_REGION`        | With Vertex | GCP region (e.g., `us-east5`)                 |
+| `NOMOS_MODEL`            | No          | Model override (default: `claude-sonnet-4-6`) |
+| `SLACK_BOT_TOKEN`        | No          | Slack bot mode                                |
+| `SLACK_APP_TOKEN`        | No          | Slack Socket Mode (bot + user mode)           |
+| `SLACK_CLIENT_ID`        | No          | Slack OAuth (multi-workspace user mode)       |
+| `SLACK_CLIENT_SECRET`    | No          | Slack OAuth (multi-workspace user mode)       |
+| `SLACK_USER_TOKEN`       | No          | Legacy single-workspace user mode             |
+| `DISCORD_BOT_TOKEN`      | No          | Discord integration                           |
+| `TELEGRAM_BOT_TOKEN`     | No          | Telegram integration                          |
+| `WHATSAPP_ENABLED`       | No          | WhatsApp integration                          |
+| `IMESSAGE_ENABLED`       | No          | iMessage integration (macOS only)             |
 
 See `.env.example` for the full set of optional variables.
 
 ### MCP Server Configuration
 
-External MCP servers are configured in `.assistant/mcp.json`:
+External MCP servers are configured in `.nomos/mcp.json`:
 
 ```json
 {
@@ -507,28 +507,28 @@ External MCP servers are configured in `.assistant/mcp.json`:
 }
 ```
 
-Searched in order: project-local `.assistant/mcp.json`, then global `~/.assistant/mcp.json`.
+Searched in order: project-local `.nomos/mcp.json`, then global `~/.nomos/mcp.json`.
 
 ## 8. CLI Commands
 
-| Command | Description |
-|---|---|
-| `assistant chat` | Start interactive REPL (default command) |
-| `assistant daemon start` | Start daemon in background |
-| `assistant daemon stop` | Stop running daemon |
-| `assistant daemon restart` | Restart daemon |
-| `assistant daemon status` | Show daemon status |
-| `assistant daemon logs` | Tail daemon logs |
-| `assistant daemon run` | Run daemon in foreground |
-| `assistant slack auth` | Connect a Slack workspace (OAuth) |
-| `assistant slack auth --token` | Connect with manual token |
-| `assistant slack workspaces` | List connected workspaces |
-| `assistant slack remove <id>` | Disconnect a workspace |
-| `assistant db migrate` | Run database migrations |
-| `assistant config get/set` | Manage runtime config |
-| `assistant session list` | List sessions |
-| `assistant memory index` | Index files into memory |
-| `assistant send` | Send a proactive message |
+| Command                    | Description                              |
+| -------------------------- | ---------------------------------------- |
+| `nomos chat`               | Start interactive REPL (default command) |
+| `nomos daemon start`       | Start daemon in background               |
+| `nomos daemon stop`        | Stop running daemon                      |
+| `nomos daemon restart`     | Restart daemon                           |
+| `nomos daemon status`      | Show daemon status                       |
+| `nomos daemon logs`        | Tail daemon logs                         |
+| `nomos daemon run`         | Run daemon in foreground                 |
+| `nomos slack auth`         | Connect a Slack workspace (OAuth)        |
+| `nomos slack auth --token` | Connect with manual token                |
+| `nomos slack workspaces`   | List connected workspaces                |
+| `nomos slack remove <id>`  | Disconnect a workspace                   |
+| `nomos db migrate`         | Run database migrations                  |
+| `nomos config get/set`     | Manage runtime config                    |
+| `nomos session list`       | List sessions                            |
+| `nomos memory index`       | Index files into memory                  |
+| `nomos send`               | Send a proactive message                 |
 
 ### Slash Commands (in REPL)
 

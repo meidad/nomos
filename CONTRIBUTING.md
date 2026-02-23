@@ -1,6 +1,6 @@
 # Contributing
 
-Thanks for your interest in contributing to Assistant. This guide covers the essentials for getting set up and submitting changes.
+Thanks for your interest in contributing to Nomos. This guide covers the essentials for getting set up and submitting changes.
 
 ## Development Setup
 
@@ -9,15 +9,15 @@ Thanks for your interest in contributing to Assistant. This guide covers the ess
 ```bash
 # Clone and install
 git clone <repo-url>
-cd assistant
+cd nomos
 pnpm install
 
 # Set up the database
 docker run -d \
-  --name assistant-db \
-  -e POSTGRES_USER=assistant \
-  -e POSTGRES_PASSWORD=assistant \
-  -e POSTGRES_DB=assistant \
+  --name nomos-db \
+  -e POSTGRES_USER=nomos \
+  -e POSTGRES_PASSWORD=nomos \
+  -e POSTGRES_DB=nomos \
   -p 5432:5432 \
   pgvector/pgvector:pg17
 
@@ -127,7 +127,7 @@ Instructions for the agent when this skill is active...
 Skills are loaded from three locations (in priority order):
 
 1. `./skills/` -- project-local
-2. `~/.assistant/skills/` -- personal
+2. `~/.nomos/skills/` -- personal
 3. `skills/` -- bundled with the project
 
 You can also use the built-in `skill-creator` skill to generate new skills through conversation.

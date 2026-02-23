@@ -5,15 +5,15 @@ import path from "node:path";
 /**
  * Load TOOLS.md environment config file from filesystem.
  * Search locations (first found wins):
- * 1. ./.assistant/TOOLS.md (project-local)
- * 2. ~/.assistant/TOOLS.md (global)
+ * 1. ./.nomos/TOOLS.md (project-local)
+ * 2. ~/.nomos/TOOLS.md (global)
  *
  * @returns File contents or null if not found
  */
 export function loadToolsFile(): string | null {
   const searchPaths = [
-    path.resolve(".assistant", "TOOLS.md"),
-    path.join(os.homedir(), ".assistant", "TOOLS.md"),
+    path.resolve(".nomos", "TOOLS.md"),
+    path.join(os.homedir(), ".nomos", "TOOLS.md"),
   ];
 
   for (const filePath of searchPaths) {

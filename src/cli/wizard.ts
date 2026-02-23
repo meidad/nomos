@@ -23,23 +23,20 @@ export async function runSetupWizard(): Promise<void> {
   };
 
   console.log();
-  console.log(chalk.bold("Welcome to Assistant"));
+  console.log(chalk.bold("Welcome to Nomos"));
   console.log(chalk.dim("Let's set up your environment.\n"));
 
   // 1. Database URL
   console.log(chalk.bold("1. Database"));
   console.log(
     chalk.dim(
-      "  Assistant needs PostgreSQL with pgvector. Quick Docker setup:\n" +
-        "  docker run -d --name assistant-db \\\n" +
-        "    -e POSTGRES_USER=assistant -e POSTGRES_PASSWORD=assistant \\\n" +
-        "    -e POSTGRES_DB=assistant -p 5432:5432 pgvector/pgvector:pg17\n",
+      "  Nomos needs PostgreSQL with pgvector. Quick Docker setup:\n" +
+        "  docker run -d --name nomos-db \\\n" +
+        "    -e POSTGRES_USER=nomos -e POSTGRES_PASSWORD=nomos \\\n" +
+        "    -e POSTGRES_DB=nomos -p 5432:5432 pgvector/pgvector:pg17\n",
     ),
   );
-  const databaseUrl = await ask(
-    "  DATABASE_URL",
-    "postgresql://assistant:assistant@localhost:5432/assistant",
-  );
+  const databaseUrl = await ask("  DATABASE_URL", "postgresql://nomos:nomos@localhost:5432/nomos");
 
   // 2. API Provider
   console.log();
@@ -64,10 +61,10 @@ export async function runSetupWizard(): Promise<void> {
   // 3. Model
   console.log();
   console.log(chalk.bold("3. Model"));
-  const model = await ask("  ASSISTANT_MODEL", "claude-sonnet-4-6");
+  const model = await ask("  NOMOS_MODEL", "claude-sonnet-4-6");
 
   // Write .env
-  const lines: string[] = ["# Assistant configuration", `DATABASE_URL=${databaseUrl}`, ""];
+  const lines: string[] = ["# Nomos configuration", `DATABASE_URL=${databaseUrl}`, ""];
 
   if (anthropicApiKey) {
     lines.push(`ANTHROPIC_API_KEY=${anthropicApiKey}`);
@@ -80,7 +77,7 @@ export async function runSetupWizard(): Promise<void> {
     }
   }
 
-  lines.push("", `ASSISTANT_MODEL=${model}`, "");
+  lines.push("", `NOMOS_MODEL=${model}`, "");
 
   const envPath = path.resolve(".env");
   fs.writeFileSync(envPath, lines.join("\n"), "utf-8");

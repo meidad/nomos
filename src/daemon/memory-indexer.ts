@@ -30,7 +30,7 @@ export async function indexConversationTurn(
     `[${timestamp}] User (${sessionKey}):`,
     incoming.content,
     "",
-    "Assistant:",
+    "Nomos:",
     outgoing.content,
   ].join("\n");
 

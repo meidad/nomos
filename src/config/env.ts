@@ -2,7 +2,7 @@ import process from "node:process";
 import type { ScopeMode } from "../sessions/types.ts";
 import type { ApprovalPolicy } from "../security/tool-approval.ts";
 
-export interface AssistantConfig {
+export interface NomosConfig {
   /** PostgreSQL connection URL */
   databaseUrl?: string;
   /** Default model to use (passed to SDK) */
@@ -33,19 +33,19 @@ export interface AssistantConfig {
   toolApprovalPolicy: ApprovalPolicy;
 }
 
-export function loadEnvConfig(): AssistantConfig {
-  const betasEnv = process.env.ASSISTANT_BETAS;
-  const fallbackModelsEnv = process.env.ASSISTANT_FALLBACK_MODELS;
+export function loadEnvConfig(): NomosConfig {
+  const betasEnv = process.env.NOMOS_BETAS;
+  const fallbackModelsEnv = process.env.NOMOS_FALLBACK_MODELS;
   const isProduction = process.env.NODE_ENV === "production";
 
   return {
     databaseUrl: process.env.DATABASE_URL,
-    model: process.env.ASSISTANT_MODEL ?? "claude-sonnet-4-6",
+    model: process.env.NOMOS_MODEL ?? "claude-sonnet-4-6",
     googleCloudProject: process.env.GOOGLE_CLOUD_PROJECT,
     vertexAiLocation: process.env.VERTEX_AI_LOCATION ?? "global",
     embeddingModel: process.env.EMBEDDING_MODEL ?? "gemini-embedding-001",
     permissionMode:
-      (process.env.ASSISTANT_PERMISSION_MODE as AssistantConfig["permissionMode"]) ?? "acceptEdits",
+      (process.env.NOMOS_PERMISSION_MODE as NomosConfig["permissionMode"]) ?? "acceptEdits",
     betas: betasEnv
       ? (betasEnv
           .split(",")
@@ -61,19 +61,19 @@ export function loadEnvConfig(): AssistantConfig {
     heartbeatIntervalMs: process.env.HEARTBEAT_INTERVAL_MS
       ? parseInt(process.env.HEARTBEAT_INTERVAL_MS, 10)
       : 1800000,
-    useV2Sdk: process.env.ASSISTANT_USE_V2_SDK === "true",
+    useV2Sdk: process.env.NOMOS_USE_V2_SDK === "true",
     pairingTtlMinutes: process.env.PAIRING_TTL_MINUTES
       ? parseInt(process.env.PAIRING_TTL_MINUTES, 10)
       : 60,
     defaultDmPolicy:
       (process.env.DEFAULT_DM_POLICY as "pairing" | "allowlist" | "open") ??
       (isProduction ? "pairing" : "open"),
-    sessionScope: (process.env.ASSISTANT_SESSION_SCOPE as ScopeMode) ?? "channel",
+    sessionScope: (process.env.NOMOS_SESSION_SCOPE as ScopeMode) ?? "channel",
     toolApprovalPolicy: (process.env.TOOL_APPROVAL_POLICY as ApprovalPolicy) ?? "block_critical",
   };
 }
 
-export function validateConfig(cfg: AssistantConfig): string[] {
+export function validateConfig(cfg: NomosConfig): string[] {
   const errors: string[] = [];
 
   // SDK handles provider auth via ANTHROPIC_API_KEY or CLAUDE_CODE_USE_VERTEX env vars.

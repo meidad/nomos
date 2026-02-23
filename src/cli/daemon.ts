@@ -2,12 +2,12 @@
  * CLI commands for daemon lifecycle management.
  *
  * Usage:
- *   assistant daemon start    — Start daemon in background
- *   assistant daemon stop     — Stop running daemon
- *   assistant daemon restart  — Restart daemon
- *   assistant daemon status   — Show daemon status
- *   assistant daemon logs     — Tail daemon logs
- *   assistant daemon run      — Run daemon in foreground (for development)
+ *   nomos daemon start    — Start daemon in background
+ *   nomos daemon stop     — Stop running daemon
+ *   nomos daemon restart  — Restart daemon
+ *   nomos daemon status   — Show daemon status
+ *   nomos daemon logs     — Tail daemon logs
+ *   nomos daemon run      — Run daemon in foreground (for development)
  */
 
 import { spawn } from "node:child_process";
@@ -47,7 +47,7 @@ async function stopDaemonProcess(pid: number, timeoutMs: number = 10_000): Promi
 }
 
 export function registerDaemonCommand(program: Command): void {
-  const daemon = program.command("daemon").description("Manage the assistant daemon");
+  const daemon = program.command("daemon").description("Manage the nomos daemon");
 
   daemon
     .command("start")

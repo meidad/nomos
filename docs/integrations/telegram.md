@@ -1,26 +1,26 @@
 # Telegram Integration
 
-Connect your assistant to Telegram so it can respond to private messages and group chat mentions.
+Connect Nomos to Telegram so it can respond to private messages and group chat mentions.
 
 ## Prerequisites
 
 - A Telegram account
-- The assistant daemon running (`pnpm daemon:dev` or `assistant daemon start`)
+- The Nomos daemon running (`pnpm daemon:dev` or `nomos daemon start`)
 
 ## Step 1: Create a Bot with BotFather
 
 1. Open Telegram and search for [@BotFather](https://t.me/BotFather)
 2. Send `/newbot`
 3. Follow the prompts:
-   - **Name:** Choose a display name (e.g., "My Assistant")
-   - **Username:** Choose a unique username ending in `bot` (e.g., `my_assistant_bot`)
+   - **Name:** Choose a display name (e.g., "Nomos")
+   - **Username:** Choose a unique username ending in `bot` (e.g., `my_nomos_bot`)
 4. BotFather will reply with your bot token — copy it
 
 The token looks like: `123456789:ABCdefGHIjklMNOpqrsTUVwxyz`
 
 ## Step 2: Configure Environment Variables
 
-Add the token to your `.env` file in the `assistant/` directory:
+Add the token to your `.env` file in the `nomos/` directory:
 
 ```bash
 TELEGRAM_BOT_TOKEN=123456789:ABCdefGHIjklMNOpqrsTUVwxyz
@@ -84,13 +84,13 @@ Select the bot and choose **Disable**.
 pnpm daemon:dev
 
 # Or production mode (background)
-assistant daemon start
+nomos daemon start
 ```
 
 You should see output confirming the Telegram adapter started:
 
 ```
-[telegram-adapter] Running (bot: @my_assistant_bot)
+[telegram-adapter] Running (bot: @my_nomos_bot)
 [gateway]   Channels: telegram
 ```
 
@@ -165,7 +165,7 @@ The adapter handles these limits automatically.
 - Verify `TELEGRAM_BOT_TOKEN` is set correctly
 - Check daemon logs for errors
 - Try sending `/start` to the bot first
-- Make sure the daemon is running (`assistant daemon status`)
+- Make sure the daemon is running (`nomos daemon status`)
 
 ### Bot doesn't respond in groups
 
@@ -184,4 +184,4 @@ The adapter uses long polling and automatically reconnects on disconnections. If
 
 - Check if the daemon process is still running
 - Look for error messages in the daemon logs
-- Restart the daemon: `assistant daemon restart`
+- Restart the daemon: `nomos daemon restart`

@@ -87,6 +87,14 @@ export class Gateway {
     // Initialize agent runtime (loads config, runs migrations)
     await this.runtime.initialize();
 
+    // Seed autonomous loops (idempotent — safe to call on every start)
+    try {
+      const { seedAutonomousLoops } = await import("./autonomous.ts");
+      await seedAutonomousLoops();
+    } catch (err) {
+      console.warn("[gateway] Failed to seed autonomous loops:", err);
+    }
+
     // Start WebSocket server
     await this.wsServer.start();
 

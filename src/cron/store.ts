@@ -141,6 +141,13 @@ export class CronStore {
     return row ? this.rowToJob(row) : null;
   }
 
+  async getJobByName(name: string): Promise<CronJob | null> {
+    const [row] = await this.sql<CronJobRow[]>`
+      SELECT * FROM cron_jobs WHERE name = ${name}
+    `;
+    return row ? this.rowToJob(row) : null;
+  }
+
   async listJobs(filter?: CronJobFilter): Promise<CronJob[]> {
     let query = this.sql<CronJobRow[]>`SELECT * FROM cron_jobs WHERE true`;
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Security audit tool for the assistant.
+ * Security audit tool for nomos.
  *
  * Scans configuration for potential security issues:
  * - Config/env validation
@@ -69,7 +69,7 @@ async function checkDatabaseConnection(): Promise<CheckResult> {
 }
 
 /**
- * Check if ASSISTANT_MODEL is a valid model string.
+ * Check if NOMOS_MODEL is a valid model string.
  */
 function checkModelConfig(): CheckResult {
   const cfg = loadEnvConfig();
@@ -78,7 +78,7 @@ function checkModelConfig(): CheckResult {
   if (!cfg.model) {
     return {
       status: "fail",
-      message: "ASSISTANT_MODEL is not set",
+      message: "NOMOS_MODEL is not set",
     };
   }
 
@@ -87,13 +87,13 @@ function checkModelConfig(): CheckResult {
   if (!hasValidPrefix) {
     return {
       status: "warn",
-      message: `ASSISTANT_MODEL "${cfg.model}" doesn't match known model prefixes (${validPrefixes.join(", ")})`,
+      message: `NOMOS_MODEL "${cfg.model}" doesn't match known model prefixes (${validPrefixes.join(", ")})`,
     };
   }
 
   return {
     status: "pass",
-    message: `ASSISTANT_MODEL is set to "${cfg.model}"`,
+    message: `NOMOS_MODEL is set to "${cfg.model}"`,
   };
 }
 
@@ -130,11 +130,11 @@ function checkPermissionMode(): CheckResult {
 function checkDeprecatedEnvVars(): CheckResult {
   const knownVars = new Set([
     "DATABASE_URL",
-    "ASSISTANT_MODEL",
-    "ASSISTANT_PERMISSION_MODE",
-    "ASSISTANT_BETAS",
-    "ASSISTANT_FALLBACK_MODELS",
-    "ASSISTANT_USE_V2_SDK",
+    "NOMOS_MODEL",
+    "NOMOS_PERMISSION_MODE",
+    "NOMOS_BETAS",
+    "NOMOS_FALLBACK_MODELS",
+    "NOMOS_USE_V2_SDK",
     "ANTHROPIC_API_KEY",
     "CLAUDE_CODE_USE_VERTEX",
     "GOOGLE_CLOUD_PROJECT",
@@ -339,8 +339,8 @@ function checkEnvInGitignore(): CheckResult {
 function scanSkillsForSecrets(): CheckResult {
   const skillsDirs = [
     path.join(process.cwd(), "skills"),
-    path.join(process.cwd(), ".assistant", "skills"),
-    path.join(os.homedir(), ".assistant", "skills"),
+    path.join(process.cwd(), ".nomos", "skills"),
+    path.join(os.homedir(), ".nomos", "skills"),
   ];
 
   const secretPatterns = [
@@ -710,7 +710,7 @@ function checkPairingConfig(): CheckResult {
  * Run all security checks.
  */
 export async function runDoctor(): Promise<void> {
-  console.log(chalk.bold("\n🏥 Assistant Security Audit\n"));
+  console.log(chalk.bold("\n🏥 Nomos Security Audit\n"));
 
   const categories: CheckCategory[] = [
     {

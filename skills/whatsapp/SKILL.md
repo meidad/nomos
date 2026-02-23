@@ -14,7 +14,7 @@ The WhatsApp integration uses QR code authentication:
 
 1. Run `npx tsx src/integrations/whatsapp.ts`
 2. Scan the QR code with WhatsApp on your phone (Linked Devices)
-3. Auth credentials are saved to `~/.assistant/whatsapp-auth/` for reconnection
+3. Auth credentials are saved to `~/.nomos/whatsapp-auth/` for reconnection
 
 ## Running the Bot
 
@@ -85,4 +85,4 @@ JID formats:
 - In groups, prefix messages with `/`, `!`, or `@` to trigger the bot without mentioning
 - The bot ignores its own messages and status broadcasts
 - Long messages are automatically split into multiple messages
-- Auth state is stored in `~/.assistant/whatsapp-auth/` — back up this directory to preserve sessions
+- Auth state is stored in `~/.nomos/whatsapp-auth/` — back up this directory to preserve sessions

@@ -6,7 +6,7 @@ emoji: "📱"
 
 # Telegram
 
-Interact with Telegram using the built-in MCP tools provided by the `assistant-telegram` server. These tools call the Telegram Bot API directly — no curl commands or shell environment variables needed.
+Interact with Telegram using the built-in MCP tools provided by the `nomos-telegram` server. These tools call the Telegram Bot API directly — no curl commands or shell environment variables needed.
 
 ## Available Tools
 

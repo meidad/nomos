@@ -6,7 +6,7 @@ emoji: "🎮"
 
 # Discord
 
-Interact with Discord using the built-in MCP tools provided by the `assistant-discord` server. These tools call the Discord REST API directly — no curl commands or shell environment variables needed.
+Interact with Discord using the built-in MCP tools provided by the `nomos-discord` server. These tools call the Discord REST API directly — no curl commands or shell environment variables needed.
 
 ## Available Tools
 
@@ -83,6 +83,29 @@ Use `discord_list_channels` with a guild ID to discover channel IDs, names, and 
 - Mention users as `<@USER_ID>`, channels as `<#CHANNEL_ID>`, roles as `<@&ROLE_ID>`.
 - Use Discord markdown: `**bold**`, `*italic*`, `> quote`, `` `code` ``, ` ```codeblock``` `.
 - Embeds support richer formatting than plain messages.
+
+## Autonomous Discord Monitoring
+
+Nomos can autonomously monitor Discord channels in the background using the daemon. When a user asks you to "watch my Discord", "monitor channels", or "listen for messages", guide them:
+
+1. **Start the daemon** (if not already running):
+
+   ```bash
+   nomos daemon start
+   ```
+
+   The daemon connects to Discord automatically when `DISCORD_BOT_TOKEN` is configured and listens for messages in real-time.
+
+2. **Create a custom monitoring loop** for periodic checks:
+
+   ```bash
+   nomos cron create discord-watch "*/15 * * * *" --prompt "Check #support and #bugs for unanswered questions. Summarize anything that needs attention."
+   ```
+
+3. **Check loop status**:
+   ```bash
+   nomos cron list
+   ```
 
 ## Tips
 

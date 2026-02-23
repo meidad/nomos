@@ -5,15 +5,15 @@ import path from "node:path";
 /**
  * Load SOUL.md personality file from filesystem.
  * Search locations (first found wins):
- * 1. ./.assistant/SOUL.md (project-local)
- * 2. ~/.assistant/SOUL.md (global)
+ * 1. ./.nomos/SOUL.md (project-local)
+ * 2. ~/.nomos/SOUL.md (global)
  *
  * @returns File contents or null if not found
  */
 export function loadSoulFile(): string | null {
   const searchPaths = [
-    path.resolve(".assistant", "SOUL.md"),
-    path.join(os.homedir(), ".assistant", "SOUL.md"),
+    path.resolve(".nomos", "SOUL.md"),
+    path.join(os.homedir(), ".nomos", "SOUL.md"),
   ];
 
   for (const filePath of searchPaths) {

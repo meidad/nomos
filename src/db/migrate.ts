@@ -130,6 +130,7 @@ CREATE TABLE IF NOT EXISTS cron_jobs (
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
+CREATE UNIQUE INDEX IF NOT EXISTS idx_cron_name ON cron_jobs(name);
 CREATE INDEX IF NOT EXISTS idx_cron_enabled ON cron_jobs(enabled);
 CREATE INDEX IF NOT EXISTS idx_cron_platform ON cron_jobs(platform);
 

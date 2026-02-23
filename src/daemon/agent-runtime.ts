@@ -16,7 +16,7 @@ import {
   isGoogleWorkspaceConfigured,
   createGoogleWorkspaceMcpConfigs,
 } from "../sdk/google-workspace-mcp.ts";
-import { loadEnvConfig, type AssistantConfig } from "../config/env.ts";
+import { loadEnvConfig, type NomosConfig } from "../config/env.ts";
 import {
   loadUserProfile,
   loadAgentIdentity,
@@ -36,7 +36,7 @@ import type { IncomingMessage, OutgoingMessage, AgentEvent } from "./types.ts";
 
 export class AgentRuntime {
   // Cached at startup
-  private config!: AssistantConfig;
+  private config!: NomosConfig;
   private profile!: UserProfile;
   private identity!: AgentIdentity;
   private systemPromptAppend!: string;
@@ -99,17 +99,27 @@ export class AgentRuntime {
         this.mcpServers[name] = serverConfig as McpServerConfig;
       }
     }
-    this.mcpServers["assistant-memory"] = createMemoryMcpServer();
+    this.mcpServers["nomos-memory"] = createMemoryMcpServer();
 
     // Channel MCP servers (when tokens are configured)
     if (isSlackConfigured()) {
-      this.mcpServers["assistant-slack"] = createSlackMcpServer();
+      this.mcpServers["nomos-slack"] = createSlackMcpServer();
     }
+
+    // Per-workspace Slack MCP servers for autonomous multi-workspace management
+    try {
+      const { createPerWorkspaceSlackMcpServers } = await import("../sdk/slack-workspace-mcp.ts");
+      const wsServers = await createPerWorkspaceSlackMcpServers();
+      Object.assign(this.mcpServers, wsServers);
+    } catch {
+      // DB not available or no workspaces configured — skip
+    }
+
     if (isDiscordConfigured()) {
-      this.mcpServers["assistant-discord"] = createDiscordMcpServer();
+      this.mcpServers["nomos-discord"] = createDiscordMcpServer();
     }
     if (isTelegramConfigured()) {
-      this.mcpServers["assistant-telegram"] = createTelegramMcpServer();
+      this.mcpServers["nomos-telegram"] = createTelegramMcpServer();
     }
     if (isGoogleWorkspaceConfigured()) {
       Object.assign(this.mcpServers, createGoogleWorkspaceMcpConfigs());
@@ -123,7 +133,7 @@ export class AgentRuntime {
   }
 
   /** Get the loaded config. */
-  getConfig(): AssistantConfig {
+  getConfig(): NomosConfig {
     return this.config;
   }
 

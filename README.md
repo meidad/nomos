@@ -1,6 +1,6 @@
-# Assistant
+# Nomos
 
-A TypeScript CLI and multi-channel AI assistant built on top of [Claude Code](https://docs.anthropic.com/en/docs/claude-code) via the `@anthropic-ai/claude-agent-sdk`. It inherits all of Claude Code's built-in capabilities -- Bash, Read, Write, Edit, Glob, Grep, WebSearch, agent loop, compaction, streaming -- and layers on persistent sessions, a vector memory system, a daemon with channel integrations, scheduled tasks, 25 bundled skills, and deep personalization.
+A TypeScript CLI and multi-channel AI agent built on top of [Claude Code](https://docs.anthropic.com/en/docs/claude-code) via the `@anthropic-ai/claude-agent-sdk`. It inherits all of Claude Code's built-in capabilities -- Bash, Read, Write, Edit, Glob, Grep, WebSearch, agent loop, compaction, streaming -- and layers on persistent sessions, a vector memory system, a daemon with channel integrations, scheduled tasks, 25 bundled skills, and deep personalization.
 
 ## Features
 
@@ -27,15 +27,15 @@ A TypeScript CLI and multi-channel AI assistant built on top of [Claude Code](ht
 ```bash
 # 1. Start a PostgreSQL database with pgvector
 docker run -d \
-  --name assistant-db \
-  -e POSTGRES_USER=assistant \
-  -e POSTGRES_PASSWORD=assistant \
-  -e POSTGRES_DB=assistant \
+  --name nomos-db \
+  -e POSTGRES_USER=nomos \
+  -e POSTGRES_PASSWORD=nomos \
+  -e POSTGRES_DB=nomos \
   -p 5432:5432 \
   pgvector/pgvector:pg17
 
 # 2. Set up environment
-cd assistant
+cd nomos
 cp .env.example .env
 # Edit .env: set DATABASE_URL and ANTHROPIC_API_KEY (or Vertex AI credentials)
 
@@ -60,7 +60,7 @@ The first-run wizard will guide you through setup if no `.env` file is detected.
 ### 1. Install dependencies
 
 ```bash
-cd assistant
+cd nomos
 pnpm install
 ```
 
@@ -74,7 +74,7 @@ Edit `.env` with your settings:
 
 ```bash
 # --- Database (required) ---
-DATABASE_URL=postgresql://assistant:assistant@localhost:5432/assistant
+DATABASE_URL=postgresql://nomos:nomos@localhost:5432/nomos
 
 # --- Provider (choose one) ---
 
@@ -87,7 +87,7 @@ GOOGLE_CLOUD_PROJECT=my-project
 CLOUD_ML_REGION=us-east5
 
 # --- Model ---
-ASSISTANT_MODEL=claude-opus-4-6
+NOMOS_MODEL=claude-opus-4-6
 ```
 
 ### 3. Set up the database
@@ -98,10 +98,10 @@ PostgreSQL must have the [pgvector](https://github.com/pgvector/pgvector) extens
 
 ```bash
 docker run -d \
-  --name assistant-db \
-  -e POSTGRES_USER=assistant \
-  -e POSTGRES_PASSWORD=assistant \
-  -e POSTGRES_DB=assistant \
+  --name nomos-db \
+  -e POSTGRES_USER=nomos \
+  -e POSTGRES_PASSWORD=nomos \
+  -e POSTGRES_DB=nomos \
   -p 5432:5432 \
   pgvector/pgvector:pg17
 ```
@@ -109,7 +109,7 @@ docker run -d \
 Set in `.env`:
 
 ```
-DATABASE_URL=postgresql://assistant:assistant@localhost:5432/assistant
+DATABASE_URL=postgresql://nomos:nomos@localhost:5432/nomos
 ```
 
 #### Option B: Local PostgreSQL (Homebrew)
@@ -117,8 +117,8 @@ DATABASE_URL=postgresql://assistant:assistant@localhost:5432/assistant
 ```bash
 brew install postgresql@17 pgvector
 brew services start postgresql@17
-createdb assistant
-psql assistant -c "CREATE EXTENSION IF NOT EXISTS vector;"
+createdb nomos
+psql nomos -c "CREATE EXTENSION IF NOT EXISTS vector;"
 ```
 
 ### 4. Run migrations
@@ -163,14 +163,14 @@ node dist/index.js chat
 ### Daemon management
 
 ```bash
-assistant daemon start              # Start daemon in background
-assistant daemon start -p 9000      # Start on a custom port
-assistant daemon stop               # Stop the running daemon
-assistant daemon restart             # Restart the daemon
-assistant daemon status              # Show daemon PID and status
-assistant daemon logs                # Tail the last 50 lines of logs
-assistant daemon logs -n 200         # Tail more lines
-assistant daemon run                 # Run daemon in foreground (dev mode)
+nomos daemon start              # Start daemon in background
+nomos daemon start -p 9000      # Start on a custom port
+nomos daemon stop               # Stop the running daemon
+nomos daemon restart             # Restart the daemon
+nomos daemon status              # Show daemon PID and status
+nomos daemon logs                # Tail the last 50 lines of logs
+nomos daemon logs -n 200         # Tail more lines
+nomos daemon run                 # Run daemon in foreground (dev mode)
 ```
 
 ### Memory commands
@@ -210,7 +210,7 @@ pnpm dev -- session delete <id>     # Delete a session
 
 ## Daemon Mode
 
-The daemon is a long-running background process that turns the assistant into a multi-channel AI gateway. It boots an agent runtime, a WebSocket server, channel adapters, and a cron engine -- then processes incoming messages from all sources through a per-session message queue.
+The daemon is a long-running background process that turns Nomos into a multi-channel AI gateway. It boots an agent runtime, a WebSocket server, channel adapters, and a cron engine -- then processes incoming messages from all sources through a per-session message queue.
 
 ### Architecture
 
@@ -254,13 +254,13 @@ The daemon is a long-running background process that turns the assistant into a 
 
 ```bash
 # Background mode
-assistant daemon start
+nomos daemon start
 
 # Development mode (foreground with logs)
-assistant daemon run
+nomos daemon run
 ```
 
-The daemon writes a PID file to `~/.assistant/daemon.pid` and logs to `~/.assistant/daemon.log`.
+The daemon writes a PID file to `~/.nomos/daemon.pid` and logs to `~/.nomos/daemon.log`.
 
 ## Channel Integrations
 
@@ -280,7 +280,7 @@ Responds to `@mentions` and direct messages. Supports threaded conversations wit
 
 #### Slack User Mode
 
-User Mode lets the assistant act **as you** rather than as a bot. It listens to DMs and @mentions directed at your personal Slack account, generates draft responses, and waits for your approval before sending them with your user token.
+User Mode lets Nomos act **as you** rather than as a bot. It listens to DMs and @mentions directed at your personal Slack account, generates draft responses, and waits for your approval before sending them with your user token.
 
 ```bash
 SLACK_USER_TOKEN=xoxp-...          # User OAuth Token (in addition to bot tokens above)
@@ -314,7 +314,7 @@ WHATSAPP_ENABLED=true
 WHATSAPP_ALLOWED_CHATS=15551234567@s.whatsapp.net,120363123456789012@g.us
 ```
 
-Uses the Baileys library with QR code authentication (no Meta Business API required). On first start, a QR code is displayed in the terminal for pairing. Auth state is persisted to `~/.assistant/whatsapp-auth/`.
+Uses the Baileys library with QR code authentication (no Meta Business API required). On first start, a QR code is displayed in the terminal for pairing. Auth state is persisted to `~/.nomos/whatsapp-auth/`.
 
 ## Cron and Scheduled Tasks
 
@@ -352,8 +352,8 @@ Skills are markdown files (`SKILL.md`) with YAML frontmatter that provide domain
 
 Skills are loaded from three locations, in order:
 
-1. **Bundled** -- `assistant/skills/` (shipped with the project)
-2. **Personal** -- `~/.assistant/skills/<name>/SKILL.md`
+1. **Bundled** -- `nomos/skills/` (shipped with the project)
+2. **Personal** -- `~/.nomos/skills/<name>/SKILL.md`
 3. **Project** -- `./skills/<name>/SKILL.md`
 
 ### Bundled skills
@@ -391,8 +391,8 @@ The following 25 skills are included:
 ### Creating a custom skill
 
 ```bash
-mkdir -p ~/.assistant/skills/my-skill
-cat > ~/.assistant/skills/my-skill/SKILL.md << 'EOF'
+mkdir -p ~/.nomos/skills/my-skill
+cat > ~/.nomos/skills/my-skill/SKILL.md << 'EOF'
 ---
 name: my-skill
 description: "What this skill does"
@@ -435,8 +435,8 @@ When the daemon processes a message, the user's input and the agent's response a
 - Stored with source `"conversation"` and path set to the session key (e.g., `slack:C01ABC123`)
 - Works across all channels -- Slack, Discord, Telegram, WhatsApp, and CLI via WebSocket
 - Falls back to text-only indexing (full-text search) when embeddings are unavailable
-- `assistant memory list` shows conversation memory alongside manually indexed files
-- `assistant memory clear -s conversation` clears only conversation memory
+- `nomos memory list` shows conversation memory alongside manually indexed files
+- `nomos memory clear -s conversation` clears only conversation memory
 
 ### Agent integration
 
@@ -480,8 +480,8 @@ Customize how the agent presents itself:
 
 A personality file that shapes the agent's tone and behavior. Place it at:
 
-- `./.assistant/SOUL.md` (project-local, takes priority)
-- `~/.assistant/SOUL.md` (global)
+- `./.nomos/SOUL.md` (project-local, takes priority)
+- `~/.nomos/SOUL.md` (global)
 
 The content is injected into the system prompt under a "Personality" section.
 
@@ -489,8 +489,8 @@ The content is injected into the system prompt under a "Personality" section.
 
 An environment configuration file that tells the agent about available tools and environment details. Same search paths as SOUL.md:
 
-- `./.assistant/TOOLS.md` (project-local)
-- `~/.assistant/TOOLS.md` (global)
+- `./.nomos/TOOLS.md` (project-local)
+- `~/.nomos/TOOLS.md` (global)
 
 ### Per-agent configs
 
@@ -570,13 +570,13 @@ Short IDs (first 8 characters of the UUID) are used for convenience. The command
 
 ### Exit
 
-| Command              | Description        |
-| -------------------- | ------------------ |
-| `/quit` `/exit` `/q` | Exit the assistant |
+| Command              | Description |
+| -------------------- | ----------- |
+| `/quit` `/exit` `/q` | Exit Nomos  |
 
 ## MCP Servers
 
-Add external MCP servers by creating `.assistant/mcp.json` in your project or home directory:
+Add external MCP servers by creating `.nomos/mcp.json` in your project or home directory:
 
 ```json
 {
@@ -593,7 +593,7 @@ Add external MCP servers by creating `.assistant/mcp.json` in your project or ho
 }
 ```
 
-These are passed directly to the Claude Agent SDK alongside the built-in `assistant-memory` MCP server, which exposes the `memory_search` tool.
+These are passed directly to the Claude Agent SDK alongside the built-in `nomos-memory` MCP server, which exposes the `memory_search` tool.
 
 ## WebSocket Protocol
 
@@ -775,15 +775,15 @@ docs/integrations/            # Detailed channel setup guides
 
 ### Model and behavior
 
-| Variable                    | Description                                                                   | Default             |
-| --------------------------- | ----------------------------------------------------------------------------- | ------------------- |
-| `ASSISTANT_MODEL`           | Default Claude model                                                          | `claude-sonnet-4-6` |
-| `ASSISTANT_PERMISSION_MODE` | Tool permission mode (default, acceptEdits, plan, dontAsk, bypassPermissions) | `acceptEdits`       |
-| `ASSISTANT_BETAS`           | SDK betas to enable (comma-separated)                                         | --                  |
-| `ASSISTANT_FALLBACK_MODELS` | Fallback model chain (comma-separated)                                        | --                  |
-| `ASSISTANT_USE_V2_SDK`      | Opt in to V2 SDK session API                                                  | `false`             |
-| `ASSISTANT_SESSION_SCOPE`   | Session scope mode (channel, sender, peer, channel-peer)                      | `channel`           |
-| `TOOL_APPROVAL_POLICY`      | Dangerous tool policy (always_ask, warn_only, block_critical, disabled)       | `block_critical`    |
+| Variable                | Description                                                                   | Default             |
+| ----------------------- | ----------------------------------------------------------------------------- | ------------------- |
+| `NOMOS_MODEL`           | Default Claude model                                                          | `claude-sonnet-4-6` |
+| `NOMOS_PERMISSION_MODE` | Tool permission mode (default, acceptEdits, plan, dontAsk, bypassPermissions) | `acceptEdits`       |
+| `NOMOS_BETAS`           | SDK betas to enable (comma-separated)                                         | --                  |
+| `NOMOS_FALLBACK_MODELS` | Fallback model chain (comma-separated)                                        | --                  |
+| `NOMOS_USE_V2_SDK`      | Opt in to V2 SDK session API                                                  | `false`             |
+| `NOMOS_SESSION_SCOPE`   | Session scope mode (channel, sender, peer, channel-peer)                      | `channel`           |
+| `TOOL_APPROVAL_POLICY`  | Dangerous tool policy (always_ask, warn_only, block_critical, disabled)       | `block_critical`    |
 
 ### Embeddings
 

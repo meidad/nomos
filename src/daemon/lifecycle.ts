@@ -6,7 +6,7 @@ import fs from "node:fs";
 import path from "node:path";
 import os from "node:os";
 
-const PID_DIR = path.join(os.homedir(), ".assistant");
+const PID_DIR = path.join(os.homedir(), ".nomos");
 const PID_FILE = path.join(PID_DIR, "daemon.pid");
 const LOG_FILE = path.join(PID_DIR, "daemon.log");
 

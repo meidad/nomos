@@ -11,7 +11,7 @@ export interface McpFileServerConfig {
   headers?: Record<string, string>;
 }
 
-const CONFIG_PATHS = [".assistant/mcp.json", ".assistant/mcp-servers.json"];
+const CONFIG_PATHS = [".nomos/mcp.json", ".nomos/mcp-servers.json"];
 
 export async function loadMcpConfig(): Promise<Record<string, McpFileServerConfig> | null> {
   // Try loading from current directory first, then home directory

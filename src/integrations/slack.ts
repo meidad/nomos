@@ -16,7 +16,7 @@
  *
  * Optional env:
  *   SLACK_ALLOWED_CHANNELS - Comma-separated channel IDs to restrict to
- *   ASSISTANT_MODEL        - Model to use (default: claude-sonnet-4-6)
+ *   NOMOS_MODEL            - Model to use (default: claude-sonnet-4-6)
  */
 
 import SlackBolt from "@slack/bolt";
@@ -142,8 +142,8 @@ async function handleMessage(params: {
       prompt,
       model: cfg.model,
       systemPromptAppend,
-      mcpServers: { "assistant-memory": memoryServer },
-      allowedTools: ["mcp__assistant-memory"],
+      mcpServers: { "nomos-memory": memoryServer },
+      allowedTools: ["mcp__nomos-memory"],
       permissionMode: cfg.permissionMode,
       resume: resumeId,
       maxTurns: 10,

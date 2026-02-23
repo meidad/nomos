@@ -38,7 +38,7 @@ export const theme = {
     /** User input prompt */
     user: ">",
     /** AI response prefix */
-    assistant: "✦",
+    nomos: "✦",
     /** Tool completed successfully */
     toolSuccess: "✓",
     /** Tool currently executing */

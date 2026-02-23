@@ -6,7 +6,7 @@ emoji: "💬"
 
 # Slack
 
-Interact with Slack using the built-in MCP tools provided by the `assistant-slack` server. These tools call the Slack Web API directly — no curl commands or shell environment variables needed.
+Interact with Slack using the built-in MCP tools provided by the `nomos-slack` server. These tools call the Slack Web API directly — no curl commands or shell environment variables needed.
 
 ## Available Tools
 
@@ -72,6 +72,37 @@ Use `slack_list_channels` to get channel IDs and names. Use the ID in subsequent
 ### Look up a user
 
 Use `slack_user_info` with a user ID (e.g. from a message) to get their name, email, status, and timezone.
+
+## Autonomous Slack Monitoring
+
+Nomos can autonomously monitor Slack channels in the background using the daemon and autonomous loops. When a user asks you to "listen to Slack", "watch my channels", or "monitor messages", guide them to enable this:
+
+1. **Start the daemon** (if not already running):
+
+   ```bash
+   nomos daemon start
+   ```
+
+2. **Enable the built-in `slack-digest` loop**:
+
+   ```bash
+   nomos cron enable slack-digest
+   ```
+
+   This runs every 30 minutes, scans channels for messages needing attention, and reports findings.
+
+3. **Create a custom loop** for more specific monitoring:
+
+   ```bash
+   nomos cron create my-slack-watch "*/10 * * * *" --prompt "Check #general and #engineering for any questions or action items directed at me. Summarize anything important."
+   ```
+
+4. **Check loop status**:
+   ```bash
+   nomos cron list
+   ```
+
+The daemon connects to Slack via Socket Mode and listens in real-time. Autonomous loops add proactive periodic checks on top of that. Together, they ensure no important message goes unnoticed.
 
 ## Tips
 

@@ -1,29 +1,34 @@
 {
-  "name": "assistant",
+  "name": "nomos",
   "version": "0.1.0",
-  "description": "TypeScript CLI AI assistant powered by Anthropic models",
+  "description": "TypeScript CLI AI agent powered by Anthropic models",
   "keywords": [
     "agent",
     "ai",
     "anthropic",
-    "assistant",
     "chatbot",
     "claude",
     "cli",
+    "nomos",
     "typescript"
   ],
-  "homepage": "https://github.com/user/assistant#readme",
+  "homepage": "https://github.com/user/nomos#readme",
   "bugs": {
-    "url": "https://github.com/user/assistant/issues"
+    "url": "https://github.com/user/nomos/issues"
   },
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/user/assistant.git"
+    "url": "https://github.com/user/nomos.git"
   },
   "bin": {
-    "assistant": "dist/index.js"
+    "nomos": "dist/index.js"
   },
+  "files": [
+    "dist",
+    "skills",
+    "src/db/schema.sql"
+  ],
   "type": "module",
   "main": "dist/index.js",
   "scripts": {

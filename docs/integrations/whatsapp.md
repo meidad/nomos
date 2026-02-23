@@ -1,16 +1,16 @@
 # WhatsApp Integration
 
-Connect your assistant to WhatsApp using the WhatsApp Web multi-device protocol. No Meta Business API, webhooks, or paid plans required — it works by linking to your WhatsApp account, the same way WhatsApp Web does.
+Connect Nomos to WhatsApp using the WhatsApp Web multi-device protocol. No Meta Business API, webhooks, or paid plans required — it works by linking to your WhatsApp account, the same way WhatsApp Web does.
 
 ## Prerequisites
 
 - A phone with WhatsApp installed and an active account
-- The assistant daemon running (`pnpm daemon:dev` or `assistant daemon start`)
+- The Nomos daemon running (`pnpm daemon:dev` or `nomos daemon start`)
 - Terminal access to scan the QR code on first run
 
 ## Step 1: Enable WhatsApp
 
-Add this to your `.env` file in the `assistant/` directory:
+Add this to your `.env` file in the `nomos/` directory:
 
 ```bash
 WHATSAPP_ENABLED=true
@@ -59,12 +59,12 @@ Once linked, you'll see:
 After the initial QR scan, authentication credentials are saved to:
 
 ```
-~/.assistant/whatsapp-auth/
+~/.nomos/whatsapp-auth/
 ```
 
 On subsequent daemon starts, the bot reconnects automatically without needing to scan again.
 
-> **Important:** Back up the `~/.assistant/whatsapp-auth/` directory if you want to preserve the session across machine migrations.
+> **Important:** Back up the `~/.nomos/whatsapp-auth/` directory if you want to preserve the session across machine migrations.
 
 ## Usage
 
@@ -116,7 +116,7 @@ QR codes expire after a short time. If it expires, the adapter will generate a n
 
 - The primary phone must remain connected to the internet
 - If the phone is offline for an extended period (14+ days), WhatsApp may unlink the device
-- In that case, delete `~/.assistant/whatsapp-auth/` and re-scan the QR code
+- In that case, delete `~/.nomos/whatsapp-auth/` and re-scan the QR code
 
 ### "Connection Closed" errors
 
@@ -126,7 +126,7 @@ Common causes:
 - WhatsApp app updated and changed the protocol
 - Too many linked devices (WhatsApp allows up to 4 linked devices)
 
-To fix: delete `~/.assistant/whatsapp-auth/`, restart the daemon, and re-scan.
+To fix: delete `~/.nomos/whatsapp-auth/`, restart the daemon, and re-scan.
 
 ### Messages not received in groups
 

@@ -25,41 +25,41 @@ describe("loadToolsFile", () => {
     const result = loadToolsFile();
 
     expect(result).toBeNull();
-    expect(fs.existsSync).toHaveBeenCalledWith(path.resolve(".assistant", "TOOLS.md"));
-    expect(fs.existsSync).toHaveBeenCalledWith("/home/user/.assistant/TOOLS.md");
+    expect(fs.existsSync).toHaveBeenCalledWith(path.resolve(".nomos", "TOOLS.md"));
+    expect(fs.existsSync).toHaveBeenCalledWith("/home/user/.nomos/TOOLS.md");
   });
 
   it("returns content from project-local TOOLS.md", () => {
     const toolsContent = "API_HOST=https://api.example.com\nSSH_HOST=prod-server-01";
     vi.mocked(fs.existsSync).mockImplementation((filePath) => {
-      return filePath === path.resolve(".assistant", "TOOLS.md");
+      return filePath === path.resolve(".nomos", "TOOLS.md");
     });
     vi.mocked(fs.readFileSync).mockReturnValue(toolsContent);
 
     const result = loadToolsFile();
 
     expect(result).toBe(toolsContent);
-    expect(fs.readFileSync).toHaveBeenCalledWith(path.resolve(".assistant", "TOOLS.md"), "utf-8");
+    expect(fs.readFileSync).toHaveBeenCalledWith(path.resolve(".nomos", "TOOLS.md"), "utf-8");
   });
 
   it("returns content from global TOOLS.md when project-local doesn't exist", () => {
     const toolsContent = "DEFAULT_SSH=bastion.example.com";
     vi.mocked(fs.existsSync).mockImplementation((filePath) => {
-      return filePath === "/home/user/.assistant/TOOLS.md";
+      return filePath === "/home/user/.nomos/TOOLS.md";
     });
     vi.mocked(fs.readFileSync).mockReturnValue(toolsContent);
 
     const result = loadToolsFile();
 
     expect(result).toBe(toolsContent);
-    expect(fs.readFileSync).toHaveBeenCalledWith("/home/user/.assistant/TOOLS.md", "utf-8");
+    expect(fs.readFileSync).toHaveBeenCalledWith("/home/user/.nomos/TOOLS.md", "utf-8");
   });
 
   it("prefers project-local over global TOOLS.md", () => {
     const projectContent = "PROJECT_API=https://staging.example.com";
     vi.mocked(fs.existsSync).mockReturnValue(true);
     vi.mocked(fs.readFileSync).mockImplementation((filePath) => {
-      if (filePath === path.resolve(".assistant", "TOOLS.md")) {
+      if (filePath === path.resolve(".nomos", "TOOLS.md")) {
         return projectContent;
       }
       return "GLOBAL_API=https://prod.example.com";

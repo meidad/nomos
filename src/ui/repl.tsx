@@ -1,7 +1,7 @@
 import React from "react";
 import { render } from "ink";
 import chalk from "chalk";
-import type { AssistantConfig } from "../config/env.ts";
+import type { NomosConfig } from "../config/env.ts";
 import {
   loadUserProfile,
   loadAgentIdentity,
@@ -21,7 +21,7 @@ import { App } from "./components/App.tsx";
 import type { GatewayClient } from "./gateway-client.ts";
 
 export interface ReplOptions {
-  config: AssistantConfig;
+  config: NomosConfig;
   /** MCP server configs to pass to the SDK (external + in-process) */
   mcpServers: Record<string, McpServerConfig>;
   sessionKey?: string;
@@ -117,7 +117,7 @@ export async function startRepl(options: ReplOptions): Promise<void> {
 
   await instance.waitUntilExit();
 
-  const name = identity.name !== "Assistant" ? identity.name : "";
+  const name = identity.name !== "Nomos" ? identity.name : "";
   console.log(chalk.dim(`\nGoodbye${name ? ` from ${name}` : ""}!`));
   await closeDb();
   process.exit(0);

@@ -1,17 +1,17 @@
 # Discord Integration
 
-Connect your assistant to Discord so it can respond to DMs and @mentions in server channels.
+Connect Nomos to Discord so it can respond to DMs and @mentions in server channels.
 
 ## Prerequisites
 
 - A Discord server where you have the **Manage Server** permission
-- The assistant daemon running (`pnpm daemon:dev` or `assistant daemon start`)
+- The Nomos daemon running (`pnpm daemon:dev` or `nomos daemon start`)
 
 ## Step 1: Create a Discord Application
 
 1. Go to the [Discord Developer Portal](https://discord.com/developers/applications)
 2. Click **New Application**
-3. Enter a name (e.g., "My Assistant") and click **Create**
+3. Enter a name (e.g., "Nomos") and click **Create**
 
 ## Step 2: Create a Bot User
 
@@ -56,7 +56,7 @@ Or check **Administrator** for testing (not recommended for production).
 
 ## Step 5: Configure Environment Variables
 
-Add the token to your `.env` file in the `assistant/` directory:
+Add the token to your `.env` file in the `nomos/` directory:
 
 ```bash
 DISCORD_BOT_TOKEN=your-bot-token-here
@@ -83,13 +83,13 @@ To find a channel or server ID: enable **Developer Mode** in Discord settings (u
 pnpm daemon:dev
 
 # Or production mode (background)
-assistant daemon start
+nomos daemon start
 ```
 
 You should see output confirming the Discord adapter started:
 
 ```
-[discord-adapter] Running (bot: MyAssistant#1234)
+[discord-adapter] Running (bot: Nomos#1234)
 [gateway]   Channels: discord
 ```
 
@@ -104,7 +104,7 @@ Send a DM to the bot — it responds to all direct messages automatically.
 In any channel the bot has access to, @mention it:
 
 ```
-@My Assistant explain this error in our codebase
+@Nomos explain this error in our codebase
 ```
 
 The bot must have permission to see and send messages in the channel.
@@ -167,7 +167,7 @@ The bot needs the correct permissions in each channel. Check:
 
 ### Bot appears offline
 
-- Confirm the daemon is running (`assistant daemon status`)
+- Confirm the daemon is running (`nomos daemon status`)
 - Check the token hasn't been regenerated in the Developer Portal
 - The bot reconnects automatically after disconnections, but a revoked token requires updating `.env`
 

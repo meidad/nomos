@@ -13,8 +13,8 @@ const MAX_SKILLS_PROMPT_CHARS = 30_000;
  */
 export function loadSkills(): Skill[] {
   const bundledDir = resolveBundledSkillsDir();
-  const personalDir = path.join(os.homedir(), ".assistant", "skills");
-  const projectDirs = [path.resolve("skills"), path.resolve(".assistant", "skills")];
+  const personalDir = path.join(os.homedir(), ".nomos", "skills");
+  const projectDirs = [path.resolve("skills"), path.resolve(".nomos", "skills")];
 
   const merged = new Map<string, Skill>();
 

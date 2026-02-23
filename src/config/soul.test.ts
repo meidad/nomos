@@ -25,41 +25,41 @@ describe("loadSoulFile", () => {
     const result = loadSoulFile();
 
     expect(result).toBeNull();
-    expect(fs.existsSync).toHaveBeenCalledWith(path.resolve(".assistant", "SOUL.md"));
-    expect(fs.existsSync).toHaveBeenCalledWith("/home/user/.assistant/SOUL.md");
+    expect(fs.existsSync).toHaveBeenCalledWith(path.resolve(".nomos", "SOUL.md"));
+    expect(fs.existsSync).toHaveBeenCalledWith("/home/user/.nomos/SOUL.md");
   });
 
   it("returns content from project-local SOUL.md", () => {
     const soulContent = "Be friendly and helpful.";
     vi.mocked(fs.existsSync).mockImplementation((filePath) => {
-      return filePath === path.resolve(".assistant", "SOUL.md");
+      return filePath === path.resolve(".nomos", "SOUL.md");
     });
     vi.mocked(fs.readFileSync).mockReturnValue(soulContent);
 
     const result = loadSoulFile();
 
     expect(result).toBe(soulContent);
-    expect(fs.readFileSync).toHaveBeenCalledWith(path.resolve(".assistant", "SOUL.md"), "utf-8");
+    expect(fs.readFileSync).toHaveBeenCalledWith(path.resolve(".nomos", "SOUL.md"), "utf-8");
   });
 
   it("returns content from global SOUL.md when project-local doesn't exist", () => {
     const soulContent = "Be concise and technical.";
     vi.mocked(fs.existsSync).mockImplementation((filePath) => {
-      return filePath === "/home/user/.assistant/SOUL.md";
+      return filePath === "/home/user/.nomos/SOUL.md";
     });
     vi.mocked(fs.readFileSync).mockReturnValue(soulContent);
 
     const result = loadSoulFile();
 
     expect(result).toBe(soulContent);
-    expect(fs.readFileSync).toHaveBeenCalledWith("/home/user/.assistant/SOUL.md", "utf-8");
+    expect(fs.readFileSync).toHaveBeenCalledWith("/home/user/.nomos/SOUL.md", "utf-8");
   });
 
   it("prefers project-local over global SOUL.md", () => {
     const projectContent = "Project personality";
     vi.mocked(fs.existsSync).mockReturnValue(true);
     vi.mocked(fs.readFileSync).mockImplementation((filePath) => {
-      if (filePath === path.resolve(".assistant", "SOUL.md")) {
+      if (filePath === path.resolve(".nomos", "SOUL.md")) {
         return projectContent;
       }
       return "Global personality";

@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { loadEnvConfig, validateConfig, type AssistantConfig } from "./env.ts";
+import { loadEnvConfig, validateConfig, type NomosConfig } from "./env.ts";
 
 describe("loadEnvConfig", () => {
   const originalEnv = { ...process.env };
@@ -7,13 +7,13 @@ describe("loadEnvConfig", () => {
   beforeEach(() => {
     // Clear relevant env vars before each test
     delete process.env.DATABASE_URL;
-    delete process.env.ASSISTANT_MODEL;
+    delete process.env.NOMOS_MODEL;
     delete process.env.GOOGLE_CLOUD_PROJECT;
     delete process.env.VERTEX_AI_LOCATION;
     delete process.env.EMBEDDING_MODEL;
-    delete process.env.ASSISTANT_PERMISSION_MODE;
-    delete process.env.ASSISTANT_BETAS;
-    delete process.env.ASSISTANT_FALLBACK_MODELS;
+    delete process.env.NOMOS_PERMISSION_MODE;
+    delete process.env.NOMOS_BETAS;
+    delete process.env.NOMOS_FALLBACK_MODELS;
     delete process.env.HEARTBEAT_INTERVAL_MS;
   });
 
@@ -25,9 +25,9 @@ describe("loadEnvConfig", () => {
     process.env.DATABASE_URL = "postgres://localhost/test";
     process.env.GOOGLE_CLOUD_PROJECT = "my-project";
     process.env.VERTEX_AI_LOCATION = "us-central1";
-    process.env.ASSISTANT_MODEL = "claude-opus-4-20250514";
+    process.env.NOMOS_MODEL = "claude-opus-4-20250514";
     process.env.EMBEDDING_MODEL = "text-embedding-005";
-    process.env.ASSISTANT_PERMISSION_MODE = "default";
+    process.env.NOMOS_PERMISSION_MODE = "default";
 
     const config = loadEnvConfig();
 
@@ -53,16 +53,16 @@ describe("loadEnvConfig", () => {
     expect(config.heartbeatIntervalMs).toBe(1800000);
   });
 
-  it("parses ASSISTANT_BETAS comma-separated string into array", () => {
-    process.env.ASSISTANT_BETAS = "1m-context,another-beta";
+  it("parses NOMOS_BETAS comma-separated string into array", () => {
+    process.env.NOMOS_BETAS = "1m-context,another-beta";
 
     const config = loadEnvConfig();
 
     expect(config.betas).toEqual(["1m-context", "another-beta"]);
   });
 
-  it("parses ASSISTANT_FALLBACK_MODELS comma-separated string into array", () => {
-    process.env.ASSISTANT_FALLBACK_MODELS = "claude-sonnet-4-6,claude-haiku-4-5-20251001";
+  it("parses NOMOS_FALLBACK_MODELS comma-separated string into array", () => {
+    process.env.NOMOS_FALLBACK_MODELS = "claude-sonnet-4-6,claude-haiku-4-5-20251001";
 
     const config = loadEnvConfig();
 
@@ -70,8 +70,8 @@ describe("loadEnvConfig", () => {
   });
 
   it("trims whitespace in betas and fallback models", () => {
-    process.env.ASSISTANT_BETAS = " beta1 , beta2 , beta3 ";
-    process.env.ASSISTANT_FALLBACK_MODELS = " model1 , model2 ";
+    process.env.NOMOS_BETAS = " beta1 , beta2 , beta3 ";
+    process.env.NOMOS_FALLBACK_MODELS = " model1 , model2 ";
 
     const config = loadEnvConfig();
 
@@ -80,8 +80,8 @@ describe("loadEnvConfig", () => {
   });
 
   it("filters out empty strings from betas and fallback models", () => {
-    process.env.ASSISTANT_BETAS = "beta1,,beta2";
-    process.env.ASSISTANT_FALLBACK_MODELS = "model1,,,model2";
+    process.env.NOMOS_BETAS = "beta1,,beta2";
+    process.env.NOMOS_FALLBACK_MODELS = "model1,,,model2";
 
     const config = loadEnvConfig();
 
@@ -92,7 +92,7 @@ describe("loadEnvConfig", () => {
 
 describe("validateConfig", () => {
   it("returns errors when no DATABASE_URL", () => {
-    const config: AssistantConfig = {
+    const config: NomosConfig = {
       model: "claude-sonnet-4-6",
       vertexAiLocation: "global",
       embeddingModel: "gemini-embedding-001",
@@ -111,7 +111,7 @@ describe("validateConfig", () => {
   });
 
   it("passes when DATABASE_URL is set", () => {
-    const config: AssistantConfig = {
+    const config: NomosConfig = {
       databaseUrl: "postgres://localhost/test",
       model: "claude-sonnet-4-6",
       vertexAiLocation: "global",

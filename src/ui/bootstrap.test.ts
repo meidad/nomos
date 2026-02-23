@@ -47,9 +47,9 @@ describe("bootstrap", () => {
     });
 
     it("includes the default name when identity is default", () => {
-      const identity: AgentIdentity = { name: "Assistant" };
+      const identity: AgentIdentity = { name: "Nomos" };
       const prompt = getBootstrapPrompt(identity);
-      expect(prompt).toContain("Assistant");
+      expect(prompt).toContain("Nomos");
     });
   });
 

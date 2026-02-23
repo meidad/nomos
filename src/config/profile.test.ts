@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { buildSystemPromptAppend, type UserProfile, type AgentIdentity } from "./profile.ts";
 
 describe("buildSystemPromptAppend", () => {
-  const defaultIdentity: AgentIdentity = { name: "Assistant" };
+  const defaultIdentity: AgentIdentity = { name: "Nomos" };
 
   it("includes memory instructions with empty profile", () => {
     const result = buildSystemPromptAppend({

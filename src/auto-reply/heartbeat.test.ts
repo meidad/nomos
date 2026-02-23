@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { isHeartbeatEmpty, stripHeartbeatToken, HEARTBEAT_OK } from "./heartbeat.ts";
+import { isHeartbeatEmpty, stripHeartbeatToken, HEARTBEAT_OK, AUTONOMOUS_OK } from "./heartbeat.ts";
 
 describe("isHeartbeatEmpty", () => {
   it("returns true for empty string", () => {
@@ -84,6 +84,27 @@ describe("stripHeartbeatToken", () => {
 
   it("returns original text for HEARTBEAT_OK in middle of sentence", () => {
     const text = "The status is HEARTBEAT_OK right now";
+    expect(stripHeartbeatToken(text)).toBe(text);
+  });
+
+  it("returns null for plain AUTONOMOUS_OK", () => {
+    expect(stripHeartbeatToken(AUTONOMOUS_OK)).toBe(null);
+  });
+
+  it("returns null for AUTONOMOUS_OK with whitespace", () => {
+    expect(stripHeartbeatToken("  AUTONOMOUS_OK  \n")).toBe(null);
+  });
+
+  it("returns null for backtick-wrapped AUTONOMOUS_OK", () => {
+    expect(stripHeartbeatToken("`AUTONOMOUS_OK`")).toBe(null);
+  });
+
+  it("returns null for code block wrapped AUTONOMOUS_OK", () => {
+    expect(stripHeartbeatToken("```\nAUTONOMOUS_OK\n```")).toBe(null);
+  });
+
+  it("returns original text if AUTONOMOUS_OK is part of larger message", () => {
+    const text = "Check complete. AUTONOMOUS_OK for now.";
     expect(stripHeartbeatToken(text)).toBe(text);
   });
 });

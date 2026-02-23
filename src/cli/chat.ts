@@ -62,17 +62,17 @@ export function registerChatCommand(program: Command): void {
       }
 
       // Add in-process memory search MCP server
-      mcpServers["assistant-memory"] = createMemoryMcpServer();
+      mcpServers["nomos-memory"] = createMemoryMcpServer();
 
       // Add in-process channel MCP servers (when tokens are configured)
       if (isSlackConfigured()) {
-        mcpServers["assistant-slack"] = createSlackMcpServer();
+        mcpServers["nomos-slack"] = createSlackMcpServer();
       }
       if (isDiscordConfigured()) {
-        mcpServers["assistant-discord"] = createDiscordMcpServer();
+        mcpServers["nomos-discord"] = createDiscordMcpServer();
       }
       if (isTelegramConfigured()) {
-        mcpServers["assistant-telegram"] = createTelegramMcpServer();
+        mcpServers["nomos-telegram"] = createTelegramMcpServer();
       }
       if (isGoogleWorkspaceConfigured()) {
         Object.assign(mcpServers, createGoogleWorkspaceMcpConfigs());

@@ -13,7 +13,7 @@
  *
  * Optional env:
  *   WHATSAPP_ALLOWED_CHATS - Comma-separated JIDs to restrict to
- *   ASSISTANT_MODEL        - Model to use (default: claude-sonnet-4-6)
+ *   NOMOS_MODEL            - Model to use (default: claude-sonnet-4-6)
  */
 
 import makeWASocket, {
@@ -167,8 +167,8 @@ async function handleMessage(message: proto.IWebMessageInfo, sock: WASocket) {
       prompt,
       model: cfg.model,
       systemPromptAppend,
-      mcpServers: { "assistant-memory": memoryServer },
-      allowedTools: ["mcp__assistant-memory"],
+      mcpServers: { "nomos-memory": memoryServer },
+      allowedTools: ["mcp__nomos-memory"],
       permissionMode: cfg.permissionMode,
       resume: resumeId,
       maxTurns: 10,
@@ -218,7 +218,7 @@ async function handleMessage(message: proto.IWebMessageInfo, sock: WASocket) {
 
 export async function startWhatsAppBot(): Promise<{ sock: WASocket | undefined }> {
   // Set up auth state storage
-  const authDir = path.join(os.homedir(), ".assistant", "whatsapp-auth");
+  const authDir = path.join(os.homedir(), ".nomos", "whatsapp-auth");
   fs.mkdirSync(authDir, { recursive: true });
 
   const { state, saveCreds } = await useMultiFileAuthState(authDir);

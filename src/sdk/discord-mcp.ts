@@ -476,7 +476,7 @@ export function isDiscordConfigured(): boolean {
 
 export function createDiscordMcpServer(): McpSdkServerConfigWithInstance {
   return createSdkMcpServer({
-    name: "assistant-discord",
+    name: "nomos-discord",
     version: "0.1.0",
     tools: [
       sendMessageTool,

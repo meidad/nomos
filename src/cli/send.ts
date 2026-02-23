@@ -130,8 +130,8 @@ async function processWithAgent(userMessage: string): Promise<string> {
     prompt: userMessage,
     model: cfg.model,
     systemPromptAppend,
-    mcpServers: { "assistant-memory": memoryServer },
-    allowedTools: ["mcp__assistant-memory"],
+    mcpServers: { "nomos-memory": memoryServer },
+    allowedTools: ["mcp__nomos-memory"],
     permissionMode: cfg.permissionMode,
     maxTurns: 10,
   });
@@ -205,7 +205,7 @@ async function sendTelegram(chatId: string, message: string): Promise<void> {
 
 /** Send message via WhatsApp */
 async function sendWhatsApp(jid: string, message: string): Promise<void> {
-  const authDir = path.join(os.homedir(), ".assistant", "whatsapp-auth");
+  const authDir = path.join(os.homedir(), ".nomos", "whatsapp-auth");
 
   if (!fs.existsSync(authDir)) {
     throw new Error(

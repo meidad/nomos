@@ -6,7 +6,7 @@ import { getSession, updateSessionModel } from "../db/sessions.ts";
 import { loadMcpConfig } from "../cli/mcp-config.ts";
 import { loadSkills } from "../skills/loader.ts";
 import { loadAgentConfigs, getActiveAgent } from "../config/agents.ts";
-import type { AssistantConfig } from "../config/env.ts";
+import type { NomosConfig } from "../config/env.ts";
 import type { McpServerConfig } from "../sdk/session.ts";
 
 /** Static registry of slash commands for autocomplete and dispatch. */
@@ -35,7 +35,7 @@ export const SLASH_COMMANDS = [
   { name: "approve", desc: "Approve a draft response" },
   { name: "reject", desc: "Reject a draft response" },
   { name: "slack", desc: "List connected Slack workspaces" },
-  { name: "quit", desc: "Exit the assistant" },
+  { name: "quit", desc: "Exit nomos" },
 ] as const;
 
 /** Mutable runtime state that commands can read/modify. */
@@ -51,7 +51,7 @@ export interface CommandContext {
   transcript: Array<{ role: string; content: string }>;
   session: { id: string; session_key: string };
   state: CommandState;
-  config: AssistantConfig;
+  config: NomosConfig;
   mcpServers: Record<string, McpServerConfig>;
 }
 
@@ -201,7 +201,7 @@ function cmdHelp(): string {
     "  /memory            Search or add to memory",
     "",
     chalk.bold("Exit"),
-    "  /quit  /exit  /q   Exit the assistant",
+    "  /quit  /exit  /q   Exit nomos",
   ];
   return lines.join("\n");
 }
@@ -398,7 +398,7 @@ async function cmdSkills(args: string[]): Promise<string> {
 
   if (!args[0]) {
     if (skills.length === 0) {
-      return chalk.dim("No skills loaded.\nAdd skills to ~/.assistant/skills/ or ./skills/");
+      return chalk.dim("No skills loaded.\nAdd skills to ~/.nomos/skills/ or ./skills/");
     }
     const lines = [chalk.bold(`Skills (${skills.length}):`)];
     for (const skill of skills) {
@@ -646,7 +646,7 @@ function cmdHistory(ctx: CommandContext): string {
 
   for (let i = 0; i < ctx.transcript.length; i++) {
     const msg = ctx.transcript[i];
-    const role = msg.role === "user" ? chalk.green("You") : chalk.blue("Assistant");
+    const role = msg.role === "user" ? chalk.green("You") : chalk.blue("Nomos");
     const preview = msg.content.slice(0, 120).replace(/\n/g, " ");
     const truncated = msg.content.length > 120 ? "..." : "";
     lines.push(`  ${chalk.dim(`${i + 1}.`)} ${role}: ${preview}${truncated}`);
@@ -744,7 +744,7 @@ async function cmdStatus(ctx: CommandContext): Promise<string> {
   const profileName = profile.name ?? "(not set)";
   const identityName = identity.name;
   lines.push(`  Profile:  ${profileName}`);
-  if (identityName !== "Assistant") {
+  if (identityName !== "Nomos") {
     lines.push(`  Agent:    ${identityName}${identity.emoji ? ` ${identity.emoji}` : ""}`);
   }
 
@@ -805,7 +805,7 @@ async function cmdSlackWorkspaces(): Promise<string> {
     const workspaces = await listWorkspaces();
 
     if (workspaces.length === 0) {
-      return chalk.dim('No Slack workspaces connected. Run "assistant slack auth" to connect one.');
+      return chalk.dim('No Slack workspaces connected. Run "nomos slack auth" to connect one.');
     }
 
     const lines = [chalk.bold(`Connected Slack workspaces (${workspaces.length}):`)];

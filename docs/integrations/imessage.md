@@ -1,6 +1,6 @@
 # iMessage Integration
 
-Connect your assistant to iMessage on macOS. The adapter reads incoming messages from the local Messages database and sends replies via AppleScript, enabling two-way conversations with individuals and group chats.
+Connect Nomos to iMessage on macOS. The adapter reads incoming messages from the local Messages database and sends replies via AppleScript, enabling two-way conversations with individuals and group chats.
 
 > **macOS only.** This integration relies on the Messages app and its local SQLite database, which are only available on macOS.
 
@@ -10,7 +10,7 @@ Connect your assistant to iMessage on macOS. The adapter reads incoming messages
 - Messages.app running (it must stay open)
 - **Full Disk Access** granted to your terminal app (for reading `~/Library/Messages/chat.db`)
 - **Automation** permission for `osascript` to control Messages.app
-- The assistant daemon running (`pnpm daemon:dev` or `assistant daemon start`)
+- The Nomos daemon running (`pnpm daemon:dev` or `nomos daemon start`)
 
 ## Step 1: Grant Permissions
 

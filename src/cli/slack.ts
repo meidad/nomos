@@ -2,10 +2,10 @@
  * CLI commands for Slack multi-workspace management.
  *
  * Usage:
- *   assistant slack auth              — Connect a workspace via OAuth
- *   assistant slack auth --token ...  — Connect with a manual token
- *   assistant slack workspaces        — List connected workspaces
- *   assistant slack remove <team-id>  — Remove a workspace
+ *   nomos slack auth              — Connect a workspace via OAuth
+ *   nomos slack auth --token ...  — Connect with a manual token
+ *   nomos slack workspaces        — List connected workspaces
+ *   nomos slack remove <team-id>  — Remove a workspace
  */
 
 import type { Command } from "commander";
@@ -251,7 +251,7 @@ async function listWorkspaces(): Promise<void> {
 
   if (workspaces.length === 0) {
     console.log("No Slack workspaces connected.");
-    console.log('Run "assistant slack auth" to connect one.');
+    console.log('Run "nomos slack auth" to connect one.');
   } else {
     console.log(`Connected workspaces (${workspaces.length}):\n`);
     for (const ws of workspaces) {

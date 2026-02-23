@@ -195,6 +195,40 @@ On first use, the server will open a browser window for Google OAuth authorizati
 
 With multiple accounts, each account authenticates separately on first use.
 
+## Autonomous Email & Calendar Monitoring
+
+Nomos can autonomously triage emails, prep for meetings, and send calendar briefings using the daemon and autonomous loops. When a user asks you to "watch my inbox", "monitor my email", "prep for meetings", or "brief me on my calendar", guide them to enable the built-in loops:
+
+1. **Start the daemon** (if not already running):
+
+   ```bash
+   nomos daemon start
+   ```
+
+2. **Enable the built-in loops**:
+
+   ```bash
+   # Triage inbox for unread emails and draft replies (every 15 min)
+   nomos cron enable email-triage
+
+   # Morning calendar briefing with meeting context (daily at 8 AM)
+   nomos cron enable calendar-prep
+
+   # Pre-meeting preparation for upcoming meetings (every 15 min)
+   nomos cron enable calendar-upcoming
+   ```
+
+3. **Create custom loops** for specific workflows:
+
+   ```bash
+   nomos cron create vip-inbox "*/5 * * * *" --prompt "Check for unread emails from CEO or CTO. If any, summarize and flag as urgent."
+   ```
+
+4. **Check loop status**:
+   ```bash
+   nomos cron list
+   ```
+
 ## Tips
 
 - **Gmail queries**: Use the same syntax as Gmail's search bar (`is:unread`, `from:`, `subject:`, `after:`, `before:`, `has:attachment`)

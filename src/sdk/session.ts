@@ -72,7 +72,7 @@ export function runSession(params: RunSessionParams): Query {
       betas: params.betas,
       env: {
         ...process.env,
-        CLAUDE_AGENT_SDK_CLIENT_APP: "assistant/0.1.0",
+        CLAUDE_AGENT_SDK_CLIENT_APP: "nomos/0.1.0",
       },
     },
   });

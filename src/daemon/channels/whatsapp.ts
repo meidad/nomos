@@ -56,7 +56,7 @@ export class WhatsAppAdapter implements ChannelAdapter {
   }
 
   async start(): Promise<void> {
-    const authDir = path.join(os.homedir(), ".assistant", "whatsapp-auth");
+    const authDir = path.join(os.homedir(), ".nomos", "whatsapp-auth");
     fs.mkdirSync(authDir, { recursive: true });
 
     const { state, saveCreds } = await useMultiFileAuthState(authDir);

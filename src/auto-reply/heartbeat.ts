@@ -8,17 +8,22 @@ import path from "node:path";
 export const HEARTBEAT_OK = "HEARTBEAT_OK";
 
 /**
+ * Constant returned by autonomous loops to signal "no action needed".
+ */
+export const AUTONOMOUS_OK = "AUTONOMOUS_OK";
+
+/**
  * Load HEARTBEAT.md file from filesystem.
  * Search locations (first found wins):
- * 1. ./.assistant/HEARTBEAT.md (project-local)
- * 2. ~/.assistant/HEARTBEAT.md (global)
+ * 1. ./.nomos/HEARTBEAT.md (project-local)
+ * 2. ~/.nomos/HEARTBEAT.md (global)
  *
  * @returns File contents or null if not found
  */
 export function loadHeartbeatFile(): string | null {
   const searchPaths = [
-    path.resolve(".assistant", "HEARTBEAT.md"),
-    path.join(os.homedir(), ".assistant", "HEARTBEAT.md"),
+    path.resolve(".nomos", "HEARTBEAT.md"),
+    path.join(os.homedir(), ".nomos", "HEARTBEAT.md"),
   ];
 
   for (const filePath of searchPaths) {
@@ -70,23 +75,27 @@ export function isHeartbeatEmpty(content: string): boolean {
 export function stripHeartbeatToken(text: string): string | null {
   const trimmed = text.trim();
 
-  // Check for plain HEARTBEAT_OK
-  if (trimmed === HEARTBEAT_OK) {
-    return null;
+  const tokens = [HEARTBEAT_OK, AUTONOMOUS_OK];
+
+  for (const token of tokens) {
+    // Check for plain token
+    if (trimmed === token) {
+      return null;
+    }
+
+    // Check for markdown-wrapped token (e.g., `HEARTBEAT_OK` or **HEARTBEAT_OK**)
+    const markdownWrapped = new RegExp(`^[\`*_]+${token}[\`*_]+$`);
+    if (markdownWrapped.test(trimmed)) {
+      return null;
+    }
+
+    // Check for code block wrapped token
+    const codeBlockPattern = new RegExp(`^\`\`\`[\\w]*\\s*${token}\\s*\`\`\`$`, "s");
+    if (codeBlockPattern.test(trimmed)) {
+      return null;
+    }
   }
 
-  // Check for markdown-wrapped HEARTBEAT_OK (e.g., `HEARTBEAT_OK` or **HEARTBEAT_OK**)
-  const markdownWrapped = /^[`*_]+HEARTBEAT_OK[`*_]+$/;
-  if (markdownWrapped.test(trimmed)) {
-    return null;
-  }
-
-  // Check for code block wrapped HEARTBEAT_OK
-  const codeBlockPattern = /^```[\w]*\s*HEARTBEAT_OK\s*```$/s;
-  if (codeBlockPattern.test(trimmed)) {
-    return null;
-  }
-
-  // Return original text if not just the token
+  // Return original text if not just a suppression token
   return text;
 }

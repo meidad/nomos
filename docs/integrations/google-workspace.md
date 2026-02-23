@@ -1,6 +1,6 @@
 # Google Workspace Integration
 
-Give your assistant access to Gmail, Google Calendar, Drive, Docs, Sheets, Slides, Forms, Tasks, Contacts, and Chat. The agent can read, create, and manage content across Google services on your behalf.
+Give Nomos access to Gmail, Google Calendar, Drive, Docs, Sheets, Slides, Forms, Tasks, Contacts, and Chat. The agent can read, create, and manage content across Google services on your behalf.
 
 This integration runs as an MCP server — it doesn't add a "channel" for receiving messages, but gives the agent tools to interact with Google services when responding through any channel (Slack, Discord, terminal, etc.).
 
@@ -25,7 +25,7 @@ brew install uv
 
 1. Go to [Google Cloud Console](https://console.cloud.google.com)
 2. Click the project dropdown at the top > **New Project**
-3. Name it (e.g., "My Assistant") and click **Create**
+3. Name it (e.g., "Nomos") and click **Create**
 4. Select the project from the dropdown
 
 ## Step 2: Enable APIs
@@ -68,13 +68,13 @@ You only need to enable the APIs you plan to use.
 1. Go to **APIs & Services** > **Credentials**
 2. Click **Create Credentials** > **OAuth client ID**
 3. Select **Desktop app** as the application type
-4. Name it (e.g., "Assistant Desktop")
+4. Name it (e.g., "Nomos Desktop")
 5. Click **Create**
 6. Copy the **Client ID** and **Client Secret** from the dialog
 
 ## Step 5: Configure Environment Variables
 
-Add the credentials to your `.env` file in the `assistant/` directory:
+Add the credentials to your `.env` file in the `nomos/` directory:
 
 ```bash
 GOOGLE_OAUTH_CLIENT_ID=your-client-id.apps.googleusercontent.com
@@ -210,7 +210,7 @@ If you configured multiple accounts via `GOOGLE_WORKSPACE_EMAILS`, you'll author
 
 ## Multi-Account Setup
 
-When multiple emails are configured, the assistant creates a separate MCP server for each account. The agent automatically selects the appropriate account based on context — for example, if you ask "check my work calendar," it uses the work account.
+When multiple emails are configured, Nomos creates a separate MCP server for each account. The agent automatically selects the appropriate account based on context — for example, if you ask "check my work calendar," it uses the work account.
 
 ```bash
 GOOGLE_WORKSPACE_EMAILS=work@company.com,personal@gmail.com

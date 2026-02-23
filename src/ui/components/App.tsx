@@ -1,6 +1,6 @@
 import React, { useState, useRef, useCallback, useEffect } from "react";
 import { Box, Text, Static, useApp, useInput } from "ink";
-import type { AssistantConfig } from "../../config/env.ts";
+import type { NomosConfig } from "../../config/env.ts";
 import type { AgentIdentity } from "../../config/profile.ts";
 import { appendTranscriptMessage } from "../../db/transcripts.ts";
 import { updateSessionUsage, updateSessionSdkId } from "../../db/sessions.ts";
@@ -12,7 +12,7 @@ import type { GatewayClient, ConnectionState } from "../gateway-client.ts";
 import type { AgentEvent } from "../../daemon/types.ts";
 import { theme } from "../theme.ts";
 import { UserMessage } from "./UserMessage.tsx";
-import { AssistantMessage } from "./AssistantMessage.tsx";
+import { NomosMessage } from "./NomosMessage.tsx";
 import { ToolBlock } from "./ToolBlock.tsx";
 import { ThinkingBlock } from "./ThinkingBlock.tsx";
 import { CostLine } from "./CostLine.tsx";
@@ -45,7 +45,7 @@ function nextId(): string {
 }
 
 export interface AppProps {
-  config: AssistantConfig;
+  config: NomosConfig;
   mcpServers: Record<string, McpServerConfig>;
   session: { id: string; session_key: string };
   transcript: Array<{ role: string; content: string }>;
@@ -100,8 +100,8 @@ export function App({
   // SDK session ID for multi-turn resume (enables auto-compaction).
   // Initialized from DB if resuming an existing session.
   const sdkSessionIdRef = useRef<string | null>(savedSdkSessionId ?? null);
-  // Track assistant message UUID for potential undo
-  const lastAssistantUuidRef = useRef<string | null>(null);
+  // Track response message UUID for potential undo
+  const lastResponseUuidRef = useRef<string | null>(null);
 
   const pushItem = useCallback(
     (kind: UIItem["kind"], content: string, toolMeta?: UIItem["toolMeta"]) => {
@@ -373,13 +373,13 @@ export function App({
         for await (const msg of iterate()) {
           switch (msg.type) {
             case "assistant": {
-              // Track assistant message UUID for potential undo
-              const assistantMsg = msg as {
+              // Track response message UUID for potential undo
+              const responseMsg = msg as {
                 uuid?: string;
                 message: { content: Array<{ type: string; text?: string }> };
               };
-              if (assistantMsg.uuid) {
-                lastAssistantUuidRef.current = assistantMsg.uuid;
+              if (responseMsg.uuid) {
+                lastResponseUuidRef.current = responseMsg.uuid;
               }
               for (const block of msg.message.content) {
                 if (block.type === "text" && block.text) {
@@ -530,13 +530,13 @@ export function App({
 
         // Persist assistant response
         if (textParts.length > 0) {
-          const assistantText = textParts.join("");
+          const responseText = textParts.join("");
           await appendTranscriptMessage({
             sessionId: session.id,
             role: "assistant",
-            content: assistantText,
+            content: responseText,
           });
-          transcriptRef.current.push({ role: "assistant", content: assistantText });
+          transcriptRef.current.push({ role: "assistant", content: responseText });
         }
       } catch (error) {
         setIsThinking(false);
@@ -693,7 +693,7 @@ export function App({
             case "user":
               return <UserMessage key={item.id} content={item.content} />;
             case "assistant":
-              return <AssistantMessage key={item.id} content={item.content} />;
+              return <NomosMessage key={item.id} content={item.content} />;
             case "thinking":
               return <ThinkingBlock key={item.id} content={item.content} />;
             case "tool":
@@ -734,7 +734,7 @@ export function App({
       {liveToolName && !isInputActive && <ToolBlock name={liveToolName} status="executing" />}
 
       {/* Streaming text */}
-      {streamingText && <AssistantMessage content={streamingText} />}
+      {streamingText && <NomosMessage content={streamingText} />}
 
       {/* Input area */}
       {isInputActive && (

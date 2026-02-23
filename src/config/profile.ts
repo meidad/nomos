@@ -35,7 +35,7 @@ export async function loadAgentIdentity(): Promise<AgentIdentity> {
     getConfigValue<string>("agent.purpose"),
   ]);
   return {
-    name: name ?? "Assistant",
+    name: name ?? "Nomos",
     emoji: emoji ?? undefined,
     purpose: purpose ?? undefined,
   };
@@ -93,7 +93,7 @@ export function buildSystemPromptAppend(params: {
       `## Purpose\nYou are: ${params.identity.purpose}\nThis is your core role. Let it shape how you respond, what you prioritize, and how you approach problems.`,
     );
   }
-  if (params.identity.name !== "Assistant") {
+  if (params.identity.name !== "Nomos") {
     identityParts.push(`Your name is ${params.identity.name}.`);
   }
   if (identityParts.length > 0) {

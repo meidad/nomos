@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-A TypeScript CLI and multi-channel AI assistant built on `@anthropic-ai/claude-agent-sdk`. It wraps Claude Code to get all built-in tools (Bash, Read, Write, Edit, Glob, Grep, WebSearch, etc.), agent loop, compaction, and streaming — then adds persistent sessions, vector memory, a daemon with channel integrations, scheduled tasks, 25 bundled skills, and personalization.
+A TypeScript CLI and multi-channel AI agent built on `@anthropic-ai/claude-agent-sdk`. It wraps Claude Code to get all built-in tools (Bash, Read, Write, Edit, Glob, Grep, WebSearch, etc.), agent loop, compaction, and streaming — then adds persistent sessions, vector memory, a daemon with channel integrations, scheduled tasks, 25 bundled skills, and personalization.
 
 ## Build & Development
 
@@ -112,12 +112,12 @@ See `.env.example` for the full set of optional variables (model, permissions, c
 
 ### Skills
 
-`skills/` directory contains 25 bundled SKILL.md files with YAML frontmatter. Loaded from three tiers: bundled (`skills/`), personal (`~/.assistant/skills/`), project (`./skills/`). Content injected into the system prompt.
+`skills/` directory contains 25 bundled SKILL.md files with YAML frontmatter. Loaded from three tiers: bundled (`skills/`), personal (`~/.nomos/skills/`), project (`./skills/`). Content injected into the system prompt.
 
 ## Key Design Decisions
 
 - **Claude Code IS the runtime** — don't reimplement the agent loop, tool execution, or context management
-- **In-process MCP** for memory and channel tools; external MCP from `.assistant/mcp.json`
+- **In-process MCP** for memory and channel tools; external MCP from `.nomos/mcp.json`
 - **PostgreSQL only** — no local file storage. Sessions, transcripts, memory, config all in one DB
 - **Daemon's thin adapters** (~50-100 LOC) vs standalone integrations (~200 LOC) — all agent logic centralized in `AgentRuntime`
 - **Stable session keys** — default key is `cli:default` (not timestamp-based), enabling auto-resume

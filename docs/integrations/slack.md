@@ -1,17 +1,17 @@
 # Slack Integration
 
-Connect your assistant to Slack so it can respond to DMs and @mentions in channels. Messages stream in real-time — users see a "_Thinking..._" indicator followed by progressive text updates, just like ChatGPT's Slack bot.
+Connect Nomos to Slack so it can respond to DMs and @mentions in channels. Messages stream in real-time — users see a "_Thinking..._" indicator followed by progressive text updates, just like ChatGPT's Slack bot.
 
 ## Prerequisites
 
 - A Slack workspace where you have permission to install apps
-- The assistant daemon running (`pnpm daemon:dev` or `assistant daemon start`)
+- The Nomos daemon running (`pnpm daemon:dev` or `nomos daemon start`)
 
 ## Step 1: Create a Slack App
 
 1. Go to [https://api.slack.com/apps](https://api.slack.com/apps)
 2. Click **Create New App** > **From scratch**
-3. Enter a name (e.g., "My Assistant") and select your workspace
+3. Enter a name (e.g., "Nomos") and select your workspace
 4. Click **Create App**
 
 ## Step 2: Enable Socket Mode
@@ -103,7 +103,7 @@ To find a channel ID: right-click a channel in Slack > **View channel details** 
 pnpm daemon:dev
 
 # Or production mode (background)
-assistant daemon start
+nomos daemon start
 ```
 
 You should see output confirming the Slack adapter started:
@@ -124,10 +124,10 @@ Send a DM to the bot — it responds to all messages in DMs automatically.
 In any channel the bot has been invited to, @mention it:
 
 ```
-@My Assistant what's the weather like today?
+@Nomos what's the weather like today?
 ```
 
-The bot must be invited to a channel before it can receive mentions there. Type `/invite @My Assistant` in the channel.
+The bot must be invited to a channel before it can receive mentions there. Type `/invite @Nomos` in the channel.
 
 ### Threaded Conversations
 
@@ -190,7 +190,7 @@ All of these must be in place, and the app must be reinstalled after making chan
 
 ### "not_in_channel" errors
 
-The bot needs to be a member of any channel it posts to. Invite it with `/invite @My Assistant`.
+The bot needs to be a member of any channel it posts to. Invite it with `/invite @Nomos`.
 
 ### Rate limiting
 
@@ -202,10 +202,10 @@ Socket Mode automatically reconnects. If the bot appears offline, check:
 
 - The `SLACK_APP_TOKEN` hasn't been revoked
 - The app's Socket Mode setting is still enabled
-- The daemon process is running (`assistant daemon status`)
+- The daemon process is running (`nomos daemon status`)
 
 ## Slack User Mode
 
-In addition to bot mode, the assistant supports **User Mode** — where it acts as you (the authenticated user) instead of as a bot. It listens to DMs and @mentions directed at your personal Slack account, drafts responses for your approval, and sends them using your user token so they appear as if you typed them.
+In addition to bot mode, Nomos supports **User Mode** — where it acts as you (the authenticated user) instead of as a bot. It listens to DMs and @mentions directed at your personal Slack account, drafts responses for your approval, and sends them using your user token so they appear as if you typed them.
 
 For full setup instructions, see [Slack User Mode](slack-user-mode.md).

@@ -337,7 +337,7 @@ export function isTelegramConfigured(): boolean {
 
 export function createTelegramMcpServer(): McpSdkServerConfigWithInstance {
   return createSdkMcpServer({
-    name: "assistant-telegram",
+    name: "nomos-telegram",
     version: "0.1.0",
     tools: [
       sendMessageTool,

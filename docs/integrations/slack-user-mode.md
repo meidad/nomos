@@ -1,6 +1,6 @@
 # Slack User Mode
 
-Slack User Mode lets the assistant act **as you** in Slack. Instead of replying as a bot, it listens to DMs and @mentions directed at your Slack account, drafts responses using the agent, and queues them for your approval. Once approved, the message is posted with your user token — so it appears as if you typed it yourself.
+Slack User Mode lets Nomos act **as you** in Slack. Instead of replying as a bot, it listens to DMs and @mentions directed at your Slack account, drafts responses using the agent, and queues them for your approval. Once approved, the message is posted with your user token — so it appears as if you typed it yourself.
 
 This runs alongside the regular bot-mode Slack adapter. Both use Socket Mode and can operate simultaneously.
 
@@ -108,7 +108,7 @@ SLACK_CLIENT_SECRET=your-client-secret
 Then connect each workspace:
 
 ```bash
-assistant slack auth
+nomos slack auth
 ```
 
 This opens a browser for OAuth authorization. The token is stored in the database. Repeat for each workspace.
@@ -116,14 +116,14 @@ This opens a browser for OAuth authorization. The token is stored in the databas
 You can also provide a token directly:
 
 ```bash
-assistant slack auth --token xoxp-...
+nomos slack auth --token xoxp-...
 ```
 
 Manage connected workspaces:
 
 ```bash
-assistant slack workspaces       # List all connected workspaces
-assistant slack remove T01ABC    # Disconnect a workspace
+nomos slack workspaces       # List all connected workspaces
+nomos slack remove T01ABC    # Disconnect a workspace
 ```
 
 ### Option B: Single workspace via env var (legacy)
@@ -310,7 +310,7 @@ Status flow: `pending` → `approved` → `sent`, or `pending` → `rejected`.
 
 ### Adapter doesn't start
 
-- If using OAuth: run `assistant slack workspaces` to verify stored tokens. Ensure `SLACK_APP_TOKEN` is set.
+- If using OAuth: run `nomos slack workspaces` to verify stored tokens. Ensure `SLACK_APP_TOKEN` is set.
 - If using env var: verify `SLACK_USER_TOKEN` and `SLACK_APP_TOKEN` are both set in `.env`
 - Check that user tokens start with `xoxp-` (not `xoxb-`)
 - Run `pnpm dev -- db migrate` to ensure tables exist

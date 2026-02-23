@@ -194,7 +194,7 @@ export function createMemoryMcpServer(): McpSdkServerConfigWithInstance {
   );
 
   return createSdkMcpServer({
-    name: "assistant-memory",
+    name: "nomos-memory",
     version: "0.1.0",
     tools: [memorySearchTool, bootstrapCompleteTool, browserFetchTool],
   });
