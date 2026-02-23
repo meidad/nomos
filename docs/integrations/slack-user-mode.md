@@ -53,6 +53,7 @@ Your Slack app needs **User Token Scopes** in addition to the existing Bot Token
 | `mpim:history`     | Read multi-party DMs                    |
 | `chat:write`       | Send messages as you                    |
 | `users:read`       | Look up sender names                    |
+| `search:read`      | Search messages across channels and DMs |
 
 ## Step 2: Subscribe to Team Events
 
@@ -332,6 +333,30 @@ Status flow: `pending` → `approved` → `sent`, or `pending` → `rejected`.
 - Interactivity must be enabled in the Slack app settings
 - The bot adapter must be running (buttons are handled by the `SlackAdapter`, not the user adapter)
 - Check daemon logs for action handler errors
+
+### `missing_scope` errors from the MCP server
+
+If Slack API calls return `missing_scope`, the user token is valid but lacks required OAuth scopes. This commonly happens after reinstalling the app without re-adding all scopes, or when new features require scopes not in the original setup.
+
+**Diagnosis:** Try different operations to identify which scopes are missing:
+
+| Operation             | Required Scope          |
+| --------------------- | ----------------------- |
+| List channels         | `channels:read`         |
+| Read channel messages | `channels:history`      |
+| Search messages       | `search:read`           |
+| Look up users         | `users:read`            |
+| Send messages         | `chat:write`            |
+| Read DMs              | `im:history`, `im:read` |
+
+**Fix:**
+
+1. Go to your Slack app's **OAuth & Permissions** page
+2. Under **User Token Scopes**, add the missing scope(s)
+3. **Reinstall the app** to your workspace — scope changes don't take effect until you reinstall
+4. Copy the new `xoxp-` token and update your configuration
+
+> **Tip:** `search:read` is often overlooked because it isn't required for basic messaging, but it's needed for the MCP server's `slack_search` tool.
 
 ### "not_in_channel" when sending approved message
 
